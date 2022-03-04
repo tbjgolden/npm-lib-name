@@ -1,21 +1,35 @@
 {
-  "name": "just-build",
+  "name": "npm-lib-name",
+  "version": "0.0.0",
+  "main": "_dist/cjs/index.js",
+  "module": "_dist/esm/index.js",
+  "types": "_dist/esm/index.d.ts",
+  "browser": {
+    "./_dist/cjs/index.js": "./_dist/cjs/index.js",
+    "./_dist/esm/index.js": "./_dist/esm/index.js"
+  },
+  "bin": {
+    "npm-lib-name": "./_dist/npm-lib-name"
+  },
   "scripts": {
-    "build": "node build.js"
+    "build": "node ./_scripts/build.js"
   },
   "devDependencies": {
     "@types/fs-extra": "^9.0.13",
     "@types/node-dir": "^0.0.34",
     "@types/react": "^17.0.38",
+    "@types/react-dom": "^17.0.11",
+    "@types/ws": "^8.2.2",
     "esbuild": "^0.14.11",
     "eslint": "^8.6.0",
+    "express": "^4.17.2",
+    "fs-extra": "^10.0.0",
     "json5": "^2.2.0",
     "node-dir": "^0.1.17",
     "prettier": "^2.5.1",
-    "typescript": "^4.5.4"
-  },
-  "dependencies": {
-    "fs-extra": "^10.0.0",
-    "react": "^17.0.2"
+    "react": "^17.0.2",
+    "react-dom": "^17.0.2",
+    "typescript": "^4.5.4",
+    "ws": "^8.4.2"
   }
 }

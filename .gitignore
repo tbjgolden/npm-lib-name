@@ -130,8 +130,4 @@ dist
 .pnp.*
 
 # Custom
-/cli.cjs
-/cjs
-/esm
-/server
-/browser
+/_dist

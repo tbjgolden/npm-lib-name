@@ -1,5 +1,7 @@
 {
   "prettier.prettierPath": "node_modules/prettier",
-  "prettier.configPath": ".prettierrc",
-  "prettier.requireConfig": true
+  "files.exclude": {
+    "**/.vscode": true,
+    "**/node_modules": true
+  }
 }

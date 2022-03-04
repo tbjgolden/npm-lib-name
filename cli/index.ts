@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 
-const { hello } = require("npm-lib-name/core");
+import { hello } from "npm-lib-name";
 
 const [_cmd, _fileName, ...args] = process.argv;
 const arg = args.join(" ");

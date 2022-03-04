@@ -1,5 +1,2 @@
-/cjs
-/esm
-/browser
-/cli.cjs
-/tsconfig.jsonify
+/_dist
+/tsconfig.json
