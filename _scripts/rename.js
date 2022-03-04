@@ -9,6 +9,10 @@ const rl = readline.createInterface({
   output: process.stdout,
 });
 
+const escapeRegExp = (str) => {
+  return string.replace(/[.*+?^${}()|[\]\\]/g, "\\$&"); // $& means the whole matched string
+};
+
 const read = (str) => {
   return new Promise((resolve) => {
     rl.question(`${str.trim()} `, (answer) => {
@@ -30,12 +34,14 @@ const rename = async (rootDir) => {
     })
   ).filter((p) => fs.statSync(p).isFile());
 
+  const re = new RegExp(escapeRegExp("just-build"), "g");
   for (const filePath of files) {
     fs.writeFileSync(
       filePath,
-      fs.readFileSync(filePath, "utf8") // .replace(/ /g, result)
+      fs.readFileSync(filePath, "utf8").replace(re, result)
     );
   }
+  fs.removeSync(path.join(__dirname, "_scripts/rename.js"));
 };
 
 rename(path.join(__dirname, ".."))
