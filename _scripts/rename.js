@@ -25,7 +25,7 @@ const rename = async (rootDir) => {
   let result;
   do {
     result = (await read(`npm package name?`)).trim();
-  } while (!validate(result).validForNewPackages);
+  } while (!validate(result).validForNewPackages || result.includes("/"));
 
   const files = (
     await glob(["**"], {
