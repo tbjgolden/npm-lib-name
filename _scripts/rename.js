@@ -10,7 +10,7 @@ const rl = readline.createInterface({
 });
 
 const escapeRegExp = (str) => {
-  return string.replace(/[.*+?^${}()|[\]\\]/g, "\\$&"); // $& means the whole matched string
+  return str.replace(/[.*+?^${}()|[\]\\]/g, "\\$&"); // $& means the whole matched string
 };
 
 const read = (str) => {
@@ -34,14 +34,14 @@ const rename = async (rootDir) => {
     })
   ).filter((p) => fs.statSync(p).isFile());
 
-  const re = new RegExp(escapeRegExp("just-build"), "g");
+  const re = new RegExp(escapeRegExp("npm-lib-name"), "g");
   for (const filePath of files) {
     fs.writeFileSync(
       filePath,
       fs.readFileSync(filePath, "utf8").replace(re, result)
     );
   }
-  fs.removeSync(path.join(__dirname, "_scripts/rename.js"));
+  fs.removeSync(path.join(__dirname, "../_scripts/rename.js"));
 };
 
 rename(path.join(__dirname, ".."))
