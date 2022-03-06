@@ -27,12 +27,12 @@ const rename = async (rootDir) => {
     execSync("git update-index --refresh && git diff-index --quiet HEAD --", {
       cwd: path.join(__dirname, ".."),
     });
-    console.log("no err");
   } catch (err) {
-    console.log("err");
+    console.log(
+      `Before running rename, ensure all your changes are committed.`
+    );
+    process.exit(1);
   }
-
-  process.exit(1);
 
   let result;
   do {
