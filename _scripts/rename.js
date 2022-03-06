@@ -1,5 +1,6 @@
 const fs = require("fs-extra");
 const path = require("path");
+const { execSync } = require("child_process");
 const { glob } = require("glob-gitignore");
 const readline = require("readline");
 const validate = require("validate-npm-package-name");
@@ -22,6 +23,17 @@ const read = (str) => {
 };
 
 const rename = async (rootDir) => {
+  try {
+    execSync("git update-index --refresh && git diff-index --quiet HEAD --", {
+      cwd: path.join(__dirname, ".."),
+    });
+    console.log("no err");
+  } catch (err) {
+    console.log("err");
+  }
+
+  process.exit(1);
+
   let result;
   do {
     result = (await read(`npm package name?`)).trim();
