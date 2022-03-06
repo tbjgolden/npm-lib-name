@@ -56,6 +56,7 @@ const rename = async (rootDir) => {
     execSync("npx husky install", {
       cwd: path.join(__dirname, ".."),
     });
+    console.log("Husky git hooks installed");
   } catch (err) {}
 };
 

@@ -15,6 +15,8 @@
     "build": "node ./_scripts/build.js"
   },
   "devDependencies": {
+    "@commitlint/cli": "^16.2.1",
+    "@commitlint/config-conventional": "^16.2.1",
     "@types/fs-extra": "^9.0.13",
     "@types/node-dir": "^0.0.34",
     "@types/react": "^17.0.38",
@@ -35,6 +37,7 @@
     "prettier": "^2.5.1",
     "react": "^17.0.2",
     "react-dom": "^17.0.2",
+    "semantic-release": "^19.0.2",
     "typescript": "^4.5.4",
     "validate-npm-package-name": "^3.0.0",
     "ws": "^8.4.2"
