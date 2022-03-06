@@ -10,3 +10,10 @@ Not included yet:
 - [ ] web build script
 - [ ] web server dev
   - [ ] web server build
+
+# Init
+
+```sh
+git clone https://github.com/tbjgolden/just-build.git <your dir>
+
+```

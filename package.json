@@ -12,8 +12,7 @@
     "npm-lib-name": "./_dist/npm-lib-name"
   },
   "scripts": {
-    "build": "node ./_scripts/build.js",
-    "prepare": "husky install"
+    "build": "node ./_scripts/build.js"
   },
   "devDependencies": {
     "@types/fs-extra": "^9.0.13",

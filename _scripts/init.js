@@ -23,17 +23,6 @@ const read = (str) => {
 };
 
 const rename = async (rootDir) => {
-  try {
-    execSync("git update-index --refresh && git diff-index --quiet HEAD --", {
-      cwd: path.join(__dirname, ".."),
-    });
-  } catch (err) {
-    console.log(
-      `Before running rename, ensure all your changes are committed.`
-    );
-    process.exit(1);
-  }
-
   let result;
   do {
     result = (await read(`npm package name?`)).trim();
@@ -54,6 +43,20 @@ const rename = async (rootDir) => {
     );
   }
   fs.removeSync(path.join(__dirname, "../_scripts/rename.js"));
+
+  try {
+    fs.removeSync(path.join(__dirname, "../.git"));
+    execSync(
+      "git init && git add . && git commit -m 'Initial commit from just-build'",
+      {
+        cwd: path.join(__dirname, ".."),
+      }
+    );
+    console.log("New git repo created");
+    execSync("npx husky install", {
+      cwd: path.join(__dirname, ".."),
+    });
+  } catch (err) {}
 };
 
 rename(path.join(__dirname, ".."))
