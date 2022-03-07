@@ -2,7 +2,7 @@
   "prettier.prettierPath": "node_modules/prettier",
   "files.exclude": {
     "**/node_modules": true,
-    "**/.husky": true,
+    // "**/.husky": true,
     "**/.github": true,
     "**/.commitlintrc.json": true,
     "**/.editorconfig": true,
