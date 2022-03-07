@@ -10,9 +10,7 @@ Output code is ES6 and targets:
 
 Not included yet:
 
-- [ ] git hooks automation
-- [ ] tests
-- [ ] release script
+- [x] tests
 - [ ] web build script
 - [ ] web server dev
   - [ ] web server build
