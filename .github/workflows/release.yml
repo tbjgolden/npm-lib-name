@@ -7,6 +7,7 @@ on:
 jobs:
   release:
     name: release
+    if: github.repository != 'tbjgolden/just-build'
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
