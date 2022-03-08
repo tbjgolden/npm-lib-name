@@ -1,15 +1,3 @@
-# Key data
-
-Dev environment requires:
-
-- node 10+
-- npm >= 5.2.0
-
-Output code is ES6 and targets:
-
-- node 10+
-- All major non-dead browsers (>93%)
-
 # Use case
 
 **OSS lib development**
@@ -34,3 +22,15 @@ npm install
 # One time init function to convert template to new project
 node _scripts/init.js
 ```
+
+# Key data
+
+Dev environment requires:
+
+- node 10+
+- npm >= 5.2.0
+
+Output code is ES6 and targets:
+
+- node 10+
+- All major non-dead browsers (>93%)
