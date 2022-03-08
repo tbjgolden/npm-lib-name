@@ -42,7 +42,7 @@ const rename = async (rootDir) => {
       fs.readFileSync(filePath, "utf8").replace(re, result)
     );
   }
-  fs.removeSync(path.join(__dirname, "../_scripts/rename.js"));
+  fs.removeSync(path.join(__dirname, "../_scripts/init.js"));
 
   try {
     fs.removeSync(path.join(__dirname, "../.git"));
