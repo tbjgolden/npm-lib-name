@@ -15,7 +15,8 @@
     "build": "node ./_scripts/build.js",
     "test": "jest",
     "coverage": "jest --coverage",
-    "watch": "jest --watch"
+    "watch": "jest --watch",
+    "husky": "husky install"
   },
   "devDependencies": {
     "@commitlint/cli": "^16.2.1",
