@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 
-import { hello } from "npm-lib-name";
+import { hello } from "../lib";
 
 const [_cmd, _fileName, ...args] = process.argv;
 const arg = args.join(" ");

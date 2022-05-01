@@ -78,7 +78,7 @@ const generate = async () => {
         ...tsConfig.compilerOptions,
         outDir: "dist/cjs",
       },
-      include: ["src/**/*"],
+      include: ["lib/**/*"],
     });
     fixPaths(path.join(projectRoot, "dist/cjs"));
 
@@ -90,7 +90,7 @@ const generate = async () => {
         module: "ES2020",
         moduleResolution: "node",
       },
-      include: ["src/**/*"],
+      include: ["lib/**/*"],
     });
     fixPaths(path.join(projectRoot, "dist/esm"));
   }

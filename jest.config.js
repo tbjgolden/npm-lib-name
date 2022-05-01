@@ -23,6 +23,6 @@ module.exports = {
   // ],
   preset: "ts-jest",
   testEnvironment: "node",
-  testMatch: ["<rootDir>/src/**/*.test.[tj]s?(x)"],
+  testMatch: ["<rootDir>/lib/**/*.test.[tj]s?(x)"],
   // timers: "real"
 };

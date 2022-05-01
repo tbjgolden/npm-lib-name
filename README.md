@@ -36,7 +36,9 @@ Output code is ES6 and targets:
 Make this better checklist:
 
 - [ ] borrow good stuff from hackathon-starter
-- [ ] js => mjs, cjs only
+- [ ] config js => mjs, cjs only
+- [ ] scripts to ts only
 - [ ] improve the awful eslint config
 - [x] remove web
+
 -->
