@@ -1,9 +1,9 @@
-const fs = require("fs-extra");
-const path = require("path");
-const { execSync } = require("child_process");
-const { glob } = require("glob-gitignore");
-const readline = require("readline");
-const validate = require("validate-npm-package-name");
+import fs from "fs-extra";
+import path from "node:path";
+import { execSync } from "node:child_process";
+import { glob } from "glob-gitignore";
+import readline from "node:readline";
+import validate from "validate-npm-package-name";
 
 const rl = readline.createInterface({
   input: process.stdin,
@@ -37,21 +37,15 @@ const rename = async (rootDir) => {
 
   const re = new RegExp(escapeRegExp("npm-lib-name"), "g");
   for (const filePath of files) {
-    fs.writeFileSync(
-      filePath,
-      fs.readFileSync(filePath, "utf8").replace(re, result)
-    );
+    fs.writeFileSync(filePath, fs.readFileSync(filePath, "utf8").replace(re, result));
   }
-  fs.removeSync(path.join(__dirname, "../.scripts/init.js"));
+  fs.removeSync(path.join(__dirname, "../.scripts/init.ts"));
 
   try {
     fs.removeSync(path.join(__dirname, "../.git"));
-    execSync(
-      "git init && git add . && git commit -m 'Initial commit from just-build'",
-      {
-        cwd: path.join(__dirname, ".."),
-      }
-    );
+    execSync("git init && git add . && git commit -m 'Initial commit from just-build'", {
+      cwd: path.join(__dirname, ".."),
+    });
     console.log("New git repo created");
     execSync("npx husky install", {
       cwd: path.join(__dirname, ".."),

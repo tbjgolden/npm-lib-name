@@ -1,9 +1,9 @@
-const { build } = require("esbuild");
-const { fork } = require("child_process");
-const fs = require("fs-extra");
-const path = require("path");
-const JSON5 = require("json5");
-const { paths } = require("node-dir");
+import { build } from "esbuild";
+import { fork } from "node:child_process";
+import fs from "fs-extra";
+import path from "node:path";
+import JSON5 from "json5";
+import { paths } from "node-dir";
 
 const projectRoot = path.join(__dirname, "..");
 
@@ -15,7 +15,7 @@ const tsConfig = JSON5.parse(
 );
 
 const fixPaths = (rootDir) => {
-  return new Promise((resolve, reject) => {
+  return new Promise<void>((resolve, reject) => {
     paths(rootDir, (err, paths) => {
       if (err) return reject(err);
       for (const filePath of paths.files) {
@@ -34,16 +34,11 @@ const fixPaths = (rootDir) => {
 };
 
 const tsc = (config = tsConfig) => {
-  fs.writeFileSync(
-    path.join(projectRoot, "tsconfig.tmp.json"),
-    JSON.stringify(config)
-  );
-  return new Promise((resolve, reject) => {
-    const child = fork(
-      "./node_modules/.bin/tsc",
-      ["--project", "tsconfig.tmp.json"],
-      { cwd: projectRoot }
-    );
+  fs.writeFileSync(path.join(projectRoot, "tsconfig.tmp.json"), JSON.stringify(config));
+  return new Promise<void>((resolve, reject) => {
+    const child = fork("./node_modules/.bin/tsc", ["--project", "tsconfig.tmp.json"], {
+      cwd: projectRoot,
+    });
     child.on("exit", (code) => {
       fs.removeSync(path.join(projectRoot, "tsconfig.tmp.json"));
       if (code) {

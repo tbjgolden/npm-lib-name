@@ -12,10 +12,10 @@
     "npm-lib-name": "./dist/npm-lib-name"
   },
   "scripts": {
-    "build": "node ./.scripts/build.js",
-    "test": "jest",
-    "coverage": "jest --coverage",
-    "watch": "jest --watch",
+    "build": "esr ./.scripts/build.ts",
+    "test": "jest -c ./.jestrc.cjs",
+    "coverage": "jest -c ./.jestrc.cjs --coverage",
+    "watch": "jest -c ./.jestrc.cjs --watch",
     "lint": "eslint lib",
     "husky": "husky install"
   },
@@ -42,10 +42,6 @@
     "typescript": "^4.6.2",
     "validate-npm-package-name": "^3.0.0"
   },
-  "lint-staged": {
-    "*.js": "eslint --cache --fix",
-    "*.{js,css,md}": "prettier --write"
-  },
   "files": [
     "dist"
   ],
@@ -53,5 +49,8 @@
     "branches": [
       "main"
     ]
+  },
+  "dependencies": {
+    "esbuild-runner": "^2.2.1"
   }
 }

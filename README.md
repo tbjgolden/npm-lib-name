@@ -17,7 +17,7 @@ git clone https://github.com/tbjgolden/just-build.git <dir>
 cd <dir>
 npm install
 # One time init function to convert template to new project
-node .scripts/init.js
+npx esr .scripts/init.ts
 ```
 
 # Key data
@@ -35,6 +35,7 @@ Output code is ES6 and targets:
 <!--
 Make this better checklist:
 
+- [ ] remove old dependencies
 - [ ] borrow good stuff from hackathon-starter
 - [ ] config js => mjs, cjs only
 - [ ] scripts to ts only
