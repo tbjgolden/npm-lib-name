@@ -63,7 +63,7 @@ const generate = async () => {
       entryPoints: ["./cli/index.ts"],
       minify: true,
       bundle: true,
-      outfile: "./_dist/npm-lib-name",
+      outfile: "./dist/npm-lib-name",
       platform: "node",
       target: "es2017",
       logLevel: "info",
@@ -76,23 +76,23 @@ const generate = async () => {
       ...tsConfig,
       compilerOptions: {
         ...tsConfig.compilerOptions,
-        outDir: "_dist/cjs",
+        outDir: "dist/cjs",
       },
       include: ["src/**/*"],
     });
-    fixPaths(path.join(projectRoot, "_dist/cjs"));
+    fixPaths(path.join(projectRoot, "dist/cjs"));
 
     await tsc({
       ...tsConfig,
       compilerOptions: {
         ...tsConfig.compilerOptions,
-        outDir: "_dist/esm",
+        outDir: "dist/esm",
         module: "ES2020",
         moduleResolution: "node",
       },
       include: ["src/**/*"],
     });
-    fixPaths(path.join(projectRoot, "_dist/esm"));
+    fixPaths(path.join(projectRoot, "dist/esm"));
   }
 };
 

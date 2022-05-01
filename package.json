@@ -1,18 +1,18 @@
 {
   "name": "npm-lib-name",
   "version": "0.0.0",
-  "main": "_dist/cjs/index.js",
-  "module": "_dist/esm/index.js",
-  "types": "_dist/esm/index.d.ts",
+  "main": "dist/cjs/index.js",
+  "module": "dist/esm/index.js",
+  "types": "dist/esm/index.d.ts",
   "browser": {
-    "./_dist/cjs/index.js": "./_dist/cjs/index.js",
-    "./_dist/esm/index.js": "./_dist/esm/index.js"
+    "./dist/cjs/index.js": "./dist/cjs/index.js",
+    "./dist/esm/index.js": "./dist/esm/index.js"
   },
   "bin": {
-    "npm-lib-name": "./_dist/npm-lib-name"
+    "npm-lib-name": "./dist/npm-lib-name"
   },
   "scripts": {
-    "build": "node ./_scripts/build.js",
+    "build": "node ./.scripts/build.js",
     "test": "jest",
     "coverage": "jest --coverage",
     "watch": "jest --watch",
@@ -25,15 +25,10 @@
     "@types/fs-extra": "^9.0.13",
     "@types/jest": "^27.4.1",
     "@types/node-dir": "^0.0.34",
-    "@types/react": "^17.0.38",
-    "@types/react-dom": "^17.0.11",
-    "@types/ws": "^8.2.2",
     "@typescript-eslint/eslint-plugin": "^5.13.0",
     "@typescript-eslint/parser": "^5.13.0",
     "esbuild": "^0.14.11",
     "eslint": "^8.6.0",
-    "eslint-plugin-react": "^7.29.3",
-    "express": "^4.17.2",
     "fs-extra": "^10.0.0",
     "glob-gitignore": "^1.0.14",
     "husky": "^7.0.4",
@@ -42,22 +37,21 @@
     "lint-staged": "^12.3.5",
     "node-dir": "^0.1.17",
     "prettier": "^2.5.1",
-    "react": "^17.0.2",
-    "react-dom": "^17.0.2",
     "semantic-release": "^19.0.2",
     "ts-jest": "^27.1.3",
     "typescript": "^4.6.2",
-    "validate-npm-package-name": "^3.0.0",
-    "ws": "^8.4.2"
+    "validate-npm-package-name": "^3.0.0"
   },
   "lint-staged": {
     "*.js": "eslint --cache --fix",
     "*.{js,css,md}": "prettier --write"
   },
   "files": [
-    "_dist"
+    "dist"
   ],
   "release": {
-    "branches": ["main"]
+    "branches": [
+      "main"
+    ]
   }
 }
