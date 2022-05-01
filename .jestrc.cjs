@@ -21,8 +21,10 @@ module.exports = {
   //   "json",
   //   "node"
   // ],
-  preset: "ts-jest",
   testEnvironment: "node",
   testMatch: ["<rootDir>/lib/**/*.test.[tj]s?(x)"],
+  transform: {
+    "\\.ts$": "esbuild-runner/jest",
+  },
   // timers: "real"
 };
