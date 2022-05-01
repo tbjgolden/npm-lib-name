@@ -35,11 +35,11 @@ Output code is ES6 and targets:
 <!--
 Make this better checklist:
 
-- [ ] remove old dependencies
+- [ ] improve the eslint config
 - [ ] borrow good stuff from hackathon-starter
-- [ ] config js => mjs, cjs only
-- [ ] scripts to ts only
-- [ ] improve the awful eslint config
+  - [ ] create help script
+- [1/2] remove old dependencies (fs-extra)
+- [x] config js => mjs, cjs only
+- [x] scripts to ts only
 - [x] remove web
-
 -->
