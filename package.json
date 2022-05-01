@@ -28,6 +28,7 @@
     "@typescript-eslint/eslint-plugin": "^5.13.0",
     "@typescript-eslint/parser": "^5.13.0",
     "esbuild": "^0.14.11",
+    "esbuild-runner": "^2.2.1",
     "eslint": "^8.6.0",
     "fs-extra": "^10.0.0",
     "glob-gitignore": "^1.0.14",
@@ -49,8 +50,5 @@
     "branches": [
       "main"
     ]
-  },
-  "dependencies": {
-    "esbuild-runner": "^2.2.1"
   }
 }
