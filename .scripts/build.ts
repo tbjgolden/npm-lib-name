@@ -5,8 +5,7 @@ import { fork } from "node:child_process";
 import { build } from "esbuild";
 import { parse } from "./deps/jsonc";
 import { rimraf } from "./deps/rimraf";
-
-const projectRoot = process.cwd();
+import { getProjectRoot } from "./deps/project";
 
 const SHOULD_BUILD_CLI = true;
 const SHOULD_BUILD_LIB = true;
@@ -18,33 +17,31 @@ type TSConfig = {
   [args: string]: unknown;
 };
 
-const tsc = async (config: TSConfig) => {
-  await fs.writeFile(path.join(projectRoot, "tsconfig.tmp.json"), JSON.stringify(config));
+const main = async () => {
+  const projectRoot = await getProjectRoot();
+  const fileContent = await fs.readFile(path.join(projectRoot, "tsconfig.json"), "utf8");
+  const tsConfig = parse<TSConfig>(fileContent);
 
-  return new Promise<void>((resolve, reject) => {
-    const child = fork("./node_modules/.bin/tsc", ["--project", "tsconfig.tmp.json"], {
-      cwd: projectRoot,
-    });
-    child.on("exit", async (code) => {
-      await fs.unlink(path.join(projectRoot, "tsconfig.tmp.json"));
-      if (code) {
-        reject(new Error(`Error code: ${code}`));
-      } else {
-        resolve();
-      }
-    });
-  });
-};
+  const tsc = async (config: TSConfig) => {
+    await fs.writeFile(
+      path.join(projectRoot, "tsconfig.tmp.json"),
+      JSON.stringify(config)
+    );
 
-const generate = async (tsConfig: TSConfig) => {
-  try {
-    const stats = await fs.stat(path.join(projectRoot, ".git"));
-    if (!stats.isDirectory()) {
-      throw new Error(".git not a directory");
-    }
-  } catch {
-    throw new Error("Must be run from project root");
-  }
+    return new Promise<void>((resolve, reject) => {
+      const child = fork("./node_modules/.bin/tsc", ["--project", "tsconfig.tmp.json"], {
+        cwd: projectRoot,
+      });
+      child.on("exit", async (code) => {
+        await fs.unlink(path.join(projectRoot, "tsconfig.tmp.json"));
+        if (code) {
+          reject(new Error(`Error code: ${code}`));
+        } else {
+          resolve();
+        }
+      });
+    });
+  };
 
   await rimraf(path.join(projectRoot, "dist"));
 
@@ -81,11 +78,6 @@ const generate = async (tsConfig: TSConfig) => {
       include: ["lib/**/*"],
     });
   }
-};
-
-const main = async () => {
-  const fileContent = await fs.readFile(path.join(projectRoot, "tsconfig.json"), "utf8");
-  generate(parse<TSConfig>(fileContent));
 };
 
 main().catch((error) => {

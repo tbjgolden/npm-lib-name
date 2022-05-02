@@ -5,8 +5,7 @@ import { execSync } from "node:child_process";
 import { prompt } from "enquirer";
 import { validate } from "./deps/npmName";
 import { rimraf } from "./deps/rimraf";
-
-const projectRoot = process.cwd();
+import { getProjectRoot } from "./deps/project";
 
 const escapeRegExp = (str: string): string => {
   return str.replace(/[$()*+.?[\\\]^{|}]/g, "\\$&"); // $& means the whole matched string
@@ -15,9 +14,7 @@ const escapeRegExp = (str: string): string => {
 const currentName = "npm-lib-name";
 
 const main = async () => {
-  if (!fs.existsSync(path.join(projectRoot, ".git"))) {
-    throw new Error("Must be run from project root");
-  }
+  const projectRoot = await getProjectRoot();
 
   const directoryName = projectRoot.slice(path.dirname(projectRoot).length + 1);
   let initial: string | undefined = validate(directoryName).valid

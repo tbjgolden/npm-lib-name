@@ -37,5 +37,4 @@ Make this better checklist:
 
 - [ ] better scope the eslint config to different file extensions
 - [ ] build infers if it should build cli/lib from if the dirs exist
-- [ ] create help script
 -->
