@@ -2,28 +2,14 @@
 import fs from "node:fs";
 import path from "node:path";
 import { execSync } from "node:child_process";
-import readline from "node:readline";
-import { stdin, stdout } from "node:process";
+import { prompt } from "enquirer";
 import { validate } from "./deps/npmName";
 import { rimraf } from "./deps/rimraf";
 
 const projectRoot = process.cwd();
 
-const rl = readline.createInterface({
-  input: stdin,
-  output: stdout,
-});
-
 const escapeRegExp = (str: string): string => {
   return str.replace(/[$()*+.?[\\\]^{|}]/g, "\\$&"); // $& means the whole matched string
-};
-
-const read = (str: string): Promise<string> => {
-  return new Promise<string>((resolve) => {
-    rl.question(`${str.trim()} `, (answer) => {
-      resolve(answer);
-    });
-  });
 };
 
 const main = async () => {
@@ -31,11 +17,30 @@ const main = async () => {
     throw new Error("Must be run from project root");
   }
 
-  let result;
+  const directoryName = projectRoot.slice(path.dirname(projectRoot).length + 1);
+  let initial: string | undefined = validate(directoryName).valid
+    ? directoryName
+    : undefined;
+  let result: string | undefined;
+  let validateResult: ReturnType<typeof validate> | undefined;
+
   do {
-    const stdin = await read(`npm package name?`);
-    result = stdin.trim();
-  } while (!validate(result).valid || result.includes("/"));
+    if (validateResult !== undefined) {
+      for (const error of validateResult.errors) {
+        console.log("  - " + error);
+      }
+    }
+
+    const { value } = await prompt<{ value: string }>({
+      type: "input",
+      name: "value",
+      message: "npm package name?",
+      initial,
+    });
+    initial = undefined;
+    result = value.trim();
+    validateResult = validate(result);
+  } while (!validateResult.valid || result.includes("/"));
 
   const stdout = execSync(
     `git status --short | grep '^?' | cut -d\\  -f2- && git ls-files`
@@ -71,14 +76,6 @@ const main = async () => {
   }
 };
 
-let mainError: Error | undefined;
-main()
-  .catch((error) => {
-    mainError = error;
-  })
-  .then(() => {
-    rl.close();
-    if (mainError !== undefined) {
-      throw mainError;
-    }
-  });
+main().catch((error) => {
+  throw error;
+});
