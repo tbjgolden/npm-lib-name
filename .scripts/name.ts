@@ -12,6 +12,8 @@ const escapeRegExp = (str: string): string => {
   return str.replace(/[$()*+.?[\\\]^{|}]/g, "\\$&"); // $& means the whole matched string
 };
 
+const currentName = "npm-lib-name";
+
 const main = async () => {
   if (!fs.existsSync(path.join(projectRoot, ".git"))) {
     throw new Error("Must be run from project root");
@@ -59,18 +61,23 @@ const main = async () => {
   for (const filePath of files) {
     fs.writeFileSync(filePath, fs.readFileSync(filePath, "utf8").replace(re, result));
   }
-  await rimraf(path.join(projectRoot, ".scripts/init.ts"));
 
   try {
-    await rimraf(path.join(projectRoot, ".git"));
-    execSync("git init && git add . && git commit -m 'Initial commit from just-build'", {
-      cwd: projectRoot,
-    });
-    console.log("New git repo created");
-    execSync("npx husky install", {
-      cwd: projectRoot,
-    });
-    console.log("Husky git hooks installed");
+    // should only run on first name
+    if (currentName === `npm${"-"}lib${"-"}name`) {
+      await rimraf(path.join(projectRoot, ".git"));
+      execSync(
+        "git init && git add . && git commit -m 'Initial commit from just-build'",
+        {
+          cwd: projectRoot,
+        }
+      );
+      console.log("New git repo created");
+      execSync("npx husky install", {
+        cwd: projectRoot,
+      });
+      console.log("Husky git hooks installed");
+    }
   } catch {
     //
   }

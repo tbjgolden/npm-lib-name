@@ -12,6 +12,7 @@
     "npm-lib-name": "./dist/npm-lib-name"
   },
   "scripts": {
+    "name": "esr ./.scripts/name.ts",
     "build": "esr ./.scripts/build.ts",
     "test": "jest -c ./.jestrc.cjs",
     "coverage": "jest -c ./.jestrc.cjs --coverage",

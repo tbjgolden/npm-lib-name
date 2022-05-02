@@ -9,7 +9,7 @@
 
 This is not a [node app starter](https://github.com/mrwade/ultimate-node-stack), a [web app starter](https://github.com/withastro/astro), or a [hybrid starter](https://github.com/vercel/next.js/).
 
-# Init
+# Name project
 
 ```sh
 # The usual
@@ -17,7 +17,7 @@ git clone https://github.com/tbjgolden/just-build.git <dir>
 cd <dir>
 npm install
 # One time init function to convert template to new project
-npx esr .scripts/init.ts
+npx esr .scripts/name.ts
 ```
 
 # Key data
