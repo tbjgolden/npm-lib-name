@@ -1,37 +1,22 @@
-import { build } from "esbuild";
-import { fork } from "node:child_process";
-import fs from "fs-extra";
+/* eslint-disable no-console */
+import fs from "node:fs";
 import path from "node:path";
-import JSON5 from "json5";
-import { paths } from "node-dir";
+import { fork } from "node:child_process";
+import { build } from "esbuild";
+import { parse } from "./deps/jsonc";
+import { rimraf } from "./deps/rimraf";
 
-const projectRoot = path.join(__dirname, "..");
+const projectRoot = process.cwd();
 
-const SHOULD_BUILD_CLI = true; // <- ignores target flags
+const SHOULD_BUILD_CLI = true;
 const SHOULD_BUILD_LIB = true;
 
-const tsConfig = JSON5.parse(
-  fs.readFileSync(path.join(projectRoot, "tsconfig.json"), "utf8")
-);
-
-const fixPaths = (rootDir) => {
-  return new Promise<void>((resolve, reject) => {
-    paths(rootDir, (err, paths) => {
-      if (err) return reject(err);
-      for (const filePath of paths.files) {
-        const dirname = path.join(filePath, "..");
-        const relPath = path.relative(dirname, rootDir);
-        fs.writeFileSync(
-          filePath,
-          fs
-            .readFileSync(filePath, "utf8")
-            .replace(/(["'])npm-lib-name\//g, `$1${relPath}/`)
-        );
-      }
-      resolve();
-    });
-  });
-};
+const tsConfig = parse<{
+  compilerOptions: {
+    [args: string]: unknown;
+  };
+  [args: string]: unknown;
+}>(fs.readFileSync(path.join(projectRoot, "tsconfig.json"), "utf8"));
 
 const tsc = (config = tsConfig) => {
   fs.writeFileSync(path.join(projectRoot, "tsconfig.tmp.json"), JSON.stringify(config));
@@ -39,8 +24,8 @@ const tsc = (config = tsConfig) => {
     const child = fork("./node_modules/.bin/tsc", ["--project", "tsconfig.tmp.json"], {
       cwd: projectRoot,
     });
-    child.on("exit", (code) => {
-      fs.removeSync(path.join(projectRoot, "tsconfig.tmp.json"));
+    child.on("exit", async (code) => {
+      await rimraf(path.join(projectRoot, "tsconfig.tmp.json"));
       if (code) {
         reject(new Error(`Error code: ${code}`));
       } else {
@@ -51,7 +36,11 @@ const tsc = (config = tsConfig) => {
 };
 
 const generate = async () => {
-  fs.removeSync(path.join(projectRoot, "dist"));
+  if (!fs.existsSync(path.join(projectRoot, ".git"))) {
+    throw new Error("Must be run from project root");
+  }
+
+  await rimraf(path.join(projectRoot, "dist"));
 
   if (SHOULD_BUILD_CLI) {
     await build({
@@ -75,7 +64,6 @@ const generate = async () => {
       },
       include: ["lib/**/*"],
     });
-    fixPaths(path.join(projectRoot, "dist/cjs"));
 
     await tsc({
       ...tsConfig,
@@ -87,11 +75,9 @@ const generate = async () => {
       },
       include: ["lib/**/*"],
     });
-    fixPaths(path.join(projectRoot, "dist/esm"));
   }
 };
 
 generate().catch((error) => {
-  console.error(error);
-  process.exit(1);
+  throw error;
 });

@@ -22,42 +22,15 @@ module.exports = {
   extends: [
     "eslint:recommended",
     "plugin:@typescript-eslint/recommended",
-    "plugin:react/recommended",
-    "plugin:react-hooks/recommended",
     "plugin:unicorn/recommended",
-    "plugin:baseui/recommended",
     "prettier",
   ],
-  plugins: ["react", "unicorn", "baseui", "prettier"],
-  settings: {
-    react: {
-      version: "detect",
-    },
-  },
+  plugins: ["@typescript-eslint", "unicorn", "prettier"],
   ignorePatterns,
   rules: {
     "arrow-body-style": ["warn", "always"],
     "no-array-constructor": "off",
-    //
-    "react/react-in-jsx-scope": "off",
-    "react/no-unescaped-entities": [1, { forbid: [">", "}"] }],
-    //
-    "@typescript-eslint/no-restricted-imports": [
-      "error",
-      {
-        paths: [
-          {
-            name: "baseui/link",
-            message: "Use \"import { Link } from '_c/Link'\" instead.",
-          },
-          {
-            name: "react-router-dom",
-            importNames: ["Link"],
-            message: "Use \"import { Link } from '_c/Link'\" instead.",
-          },
-        ],
-      },
-    ],
+    "no-console": "warn",
     "@typescript-eslint/no-unused-vars": [
       "error",
       {
@@ -71,7 +44,7 @@ module.exports = {
       },
     ],
     "@typescript-eslint/no-array-constructor": ["error"],
-    //
+    "@typescript-eslint/no-explicit-any": ["warn"],
     "unicorn/filename-case": [
       "error",
       {
@@ -107,17 +80,6 @@ module.exports = {
       rules: {
         "unicorn/prefer-module": "off",
         "@typescript-eslint/no-var-requires": "off",
-      },
-    },
-    {
-      files: "src/pages/*.tsx",
-      rules: {
-        "unicorn/filename-case": [
-          "error",
-          {
-            case: "kebabCase",
-          },
-        ],
       },
     },
   ],

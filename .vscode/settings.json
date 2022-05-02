@@ -1,19 +1,27 @@
 {
+  "editor.formatOnSave": true,
+  "editor.codeActionsOnSave": {
+    "source.fixAll.eslint": true,
+    "source.fixAll.stylelint": true
+  },
   "prettier.prettierPath": "node_modules/prettier",
+  "css.validate": false,
+  "less.validate": false,
+  "scss.validate": false,
   "files.exclude": {
-    "node_modules": true,
+    // "node_modules": true,
     ".husky": true,
     ".github": true,
     ".commitlintrc.json": true,
     ".editorconfig": true,
     ".eslintcache": true,
     ".prettierignore": true,
-    ".eslintrc.cjs": true,
+    // ".eslintrc.cjs": true,
     ".jestrc.cjs": true,
     ".prettierrc.cjs": true,
     ".lintstagedrc.cjs": true,
     "package-lock.json": true,
-    "tsconfig.json": true,
+    // "tsconfig.json": true,
     "LICENSE": true,
     "coverage": true
   }

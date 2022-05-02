@@ -21,3 +21,4 @@ dist
 .cache
 .temp
 .tern-port
+!.scripts
