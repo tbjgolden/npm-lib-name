@@ -5,7 +5,7 @@ import { fork } from "node:child_process";
 import { build } from "esbuild";
 import { parse } from "./deps/jsonc";
 import { rimraf } from "./deps/rimraf";
-import { getProjectRoot } from "./deps/project";
+import { getPackageRoot } from "./deps/package";
 
 const SHOULD_BUILD_CLI = true;
 const SHOULD_BUILD_LIB = true;
@@ -18,7 +18,7 @@ type TSConfig = {
 };
 
 const main = async () => {
-  const projectRoot = await getProjectRoot();
+  const projectRoot = await getPackageRoot();
   const fileContent = await fs.readFile(path.join(projectRoot, "tsconfig.json"), "utf8");
   const tsConfig = parse<TSConfig>(fileContent);
 

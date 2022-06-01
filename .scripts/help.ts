@@ -2,7 +2,7 @@
 /* eslint-disable no-console */
 import fs from "node:fs/promises";
 import path from "node:path";
-import { getProjectRoot } from "./deps/project";
+import { getPackageRoot } from "./deps/package";
 
 const bold = (str: string): string => {
   return `\u001B[1m${str}\u001B[0m`;
@@ -18,7 +18,7 @@ const grey = (str: string): string => {
 };
 
 const main = async () => {
-  const projectRoot = await getProjectRoot();
+  const projectRoot = await getPackageRoot();
 
   try {
     const packageJSON: {

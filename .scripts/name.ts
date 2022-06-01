@@ -5,7 +5,7 @@ import { execSync } from "node:child_process";
 import { prompt } from "enquirer";
 import { validate } from "./deps/npmName";
 import { rimraf } from "./deps/rimraf";
-import { getProjectRoot } from "./deps/project";
+import { getPackageRoot } from "./deps/package";
 
 const escapeRegExp = (str: string): string => {
   return str.replace(/[$()*+.?[\\\]^{|}]/g, "\\$&"); // $& means the whole matched string
@@ -14,7 +14,7 @@ const escapeRegExp = (str: string): string => {
 const currentName = "npm-lib-name";
 
 const main = async () => {
-  const projectRoot = await getProjectRoot();
+  const projectRoot = await getPackageRoot();
 
   const directoryName = projectRoot.slice(path.dirname(projectRoot).length + 1);
   let initial: string | undefined = validate(directoryName).valid

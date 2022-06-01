@@ -1,24 +1,23 @@
 import fs from "node:fs/promises";
 import path from "node:path";
 
-export const getProjectRoot = async (): Promise<string> => {
+export const getPackageRoot = async (): Promise<string> => {
   let directory = process.cwd();
 
   do {
     try {
-      const stats = await fs.stat(path.join(directory, ".git"));
-      if (stats.isDirectory()) {
+      const stats = await fs.stat(path.join(directory, "package.json"));
+      if (stats.isFile()) {
         break;
       }
     } catch {
       //
     }
     directory = path.dirname(directory);
-    throw new Error(".git not a directory");
   } while (directory !== "/");
 
   if (directory === "/") {
-    throw new Error("project directory not found");
+    throw new Error("package directory not found");
   }
 
   return directory;
