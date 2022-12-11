@@ -28,7 +28,7 @@ module.exports = {
   plugins: ["@typescript-eslint", "unicorn", "prettier"],
   ignorePatterns,
   rules: {
-    "arrow-body-style": ["warn", "always"],
+    "arrow-body-style": "off",
     "no-array-constructor": "off",
     "no-console": "warn",
     "@typescript-eslint/no-unused-vars": [
@@ -45,16 +45,7 @@ module.exports = {
     ],
     "@typescript-eslint/no-array-constructor": ["error"],
     "@typescript-eslint/no-explicit-any": ["warn"],
-    "unicorn/filename-case": [
-      "error",
-      {
-        cases: {
-          camelCase: true,
-          pascalCase: true,
-        },
-        ignore: ["-env\\.d\\.ts$"],
-      },
-    ],
+    "unicorn/filename-case": "off",
     "unicorn/no-null": "off",
     "unicorn/prevent-abbreviations": [
       "error",

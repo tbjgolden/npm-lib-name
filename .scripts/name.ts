@@ -68,10 +68,10 @@ const main = async () => {
         }
       );
       console.log("New git repo created");
-      execSync("npx husky install", {
+      execSync("npx simple-git-hooks", {
         cwd: projectRoot,
       });
-      console.log("Husky git hooks installed");
+      console.log("git hooks installed");
     }
   } catch {
     //
