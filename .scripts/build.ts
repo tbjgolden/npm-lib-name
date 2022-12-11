@@ -59,6 +59,7 @@ const main = async () => {
       compilerOptions: {
         ...tsConfig.compilerOptions,
         outDir: "dist/cjs",
+        noEmit: false,
       },
       include: ["lib/**/*"],
     });
@@ -70,6 +71,7 @@ const main = async () => {
         outDir: "dist/esm",
         module: "ES2020",
         moduleResolution: "node",
+        noEmit: false,
       },
       include: ["lib/**/*"],
     });
