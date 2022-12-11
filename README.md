@@ -17,7 +17,7 @@ git clone https://github.com/tbjgolden/just-build.git <dir>
 cd <dir>
 npm install
 # One time init function to convert template to new project
-npx esr .scripts/name.ts
+npx xnr .scripts/name.ts
 ```
 
 # Key data

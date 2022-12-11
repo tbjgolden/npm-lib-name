@@ -4,5 +4,5 @@ module.exports = {
     "prettier --write",
   ],
   "*.{pcss,css,js,json,html}": ["prettier --write"],
-  ".vscode/settings.json": ["esr ./.scripts/vscCheck.ts"],
+  ".vscode/settings.json": ["xnr ./.scripts/vscCheck.ts"],
 };
