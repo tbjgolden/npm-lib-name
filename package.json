@@ -4,10 +4,6 @@
   "main": "dist/cjs/index.js",
   "module": "dist/esm/index.js",
   "types": "dist/esm/index.d.ts",
-  "browser": {
-    "./dist/cjs/index.js": "./dist/cjs/index.js",
-    "./dist/esm/index.js": "./dist/esm/index.js"
-  },
   "bin": {
     "npm-lib-name": "./dist/npm-lib-name"
   },
@@ -28,7 +24,7 @@
     "help:types": "echo 'Typecheck all TS files, output to stdout'",
     "types": "tsc --noEmit && echo 'Type-checking passed'",
     "help:prepare": "echo 'Install (or reinstall) git hooks'",
-    "prepare": "husky install && rm -rf .git/hooks && ln -s ../.husky .git/hooks"
+    "prepare": "simple-git-hooks"
   },
   "devDependencies": {
     "@commitlint/cli": "^16.2.1",

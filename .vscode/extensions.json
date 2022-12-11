@@ -3,7 +3,6 @@
     "dbaeumer.vscode-eslint",
     "esbenp.prettier-vscode",
     "EditorConfig.EditorConfig",
-    "wraith13.unsaved-files-vscode",
     "naumovs.color-highlight"
   ]
 }
