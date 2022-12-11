@@ -2,10 +2,14 @@
 import fs from "node:fs/promises";
 import path from "node:path";
 import { fork } from "node:child_process";
-import { build } from "esbuild";
-import { parse } from "./deps/jsonc";
-import { rimraf } from "./deps/rimraf";
+import { build } from "xnr";
 import { getPackageRoot } from "./deps/package";
+import {
+  readJSON,
+  ensureEmptyFolderExists,
+  copyFolderContentsToFolder,
+  deleteFolder,
+} from "easier-node";
 
 const SHOULD_BUILD_CLI = true;
 const SHOULD_BUILD_LIB = true;
@@ -20,7 +24,7 @@ type TSConfig = {
 const main = async () => {
   const projectRoot = await getPackageRoot();
   const fileContent = await fs.readFile(path.join(projectRoot, "tsconfig.json"), "utf8");
-  const tsConfig = parse<TSConfig>(fileContent);
+  const tsConfig = readJSON<TSConfig>(fileContent);
 
   const tsc = async (config: TSConfig) => {
     await fs.writeFile(
@@ -43,18 +47,10 @@ const main = async () => {
     });
   };
 
-  await rimraf(path.join(projectRoot, "dist"));
+  ensureEmptyFolderExists(path.join(projectRoot, "dist"));
 
   if (SHOULD_BUILD_CLI) {
-    await build({
-      entryPoints: ["./cli/index.ts"],
-      minify: true,
-      bundle: true,
-      outfile: "./dist/npm-lib-name",
-      platform: "node",
-      target: "es2017",
-      logLevel: "info",
-    });
+    await build("./cli/index.ts");
   }
 
   if (SHOULD_BUILD_LIB) {
@@ -77,6 +73,11 @@ const main = async () => {
       },
       include: ["lib/**/*"],
     });
+  }
+
+  if (SHOULD_BUILD_CLI) {
+    await copyFolderContentsToFolder(".xnrb", "dist");
+    await deleteFolder(".xnrb");
   }
 };
 

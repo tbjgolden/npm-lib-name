@@ -5,25 +5,16 @@
   "module": "dist/esm/index.js",
   "types": "dist/esm/index.d.ts",
   "bin": {
-    "npm-lib-name": "./dist/npm-lib-name"
+    "npm-lib-name": "./dist/cli/index.mjs"
   },
   "scripts": {
-    "help": "xnr ./.scripts/help.ts",
-    "help:name": "echo 'Rename npm project'",
     "name": "xnr ./.scripts/name.ts",
-    "help:build": "echo 'Build npm project'",
     "build": "xnr ./.scripts/build.ts",
-    "help:test": "echo 'Run tests once'",
     "test": "jest -c ./.jestrc.cjs",
-    "help:coverage": "echo 'Run tests and collect coverage'",
     "coverage": "jest -c ./.jestrc.cjs --coverage",
-    "help:watch": "echo 'Run tests and rerun when the code changes'",
     "watch": "jest -c ./.jestrc.cjs --watch",
-    "help:lint": "echo 'Lint all files, output to stdout'",
     "lint": "eslint lib",
-    "help:types": "echo 'Typecheck all TS files, output to stdout'",
     "types": "tsc --noEmit && echo 'Type-checking passed'",
-    "help:prepare": "echo 'Install (or reinstall) git hooks'",
     "prepare": "simple-git-hooks"
   },
   "devDependencies": {
@@ -32,7 +23,7 @@
     "@types/jest": "^27.4.1",
     "@typescript-eslint/eslint-plugin": "^5.13.0",
     "@typescript-eslint/parser": "^5.13.0",
-    "enquirer": "^2.3.6",
+    "easier-node": "^0.0.1-beta.2",
     "esbuild": "^0.14.11",
     "eslint": "^8.6.0",
     "eslint-config-prettier": "^8.5.0",

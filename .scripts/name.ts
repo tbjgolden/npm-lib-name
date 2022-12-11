@@ -2,10 +2,9 @@
 import fs from "node:fs";
 import path from "node:path";
 import { execSync } from "node:child_process";
-import { prompt } from "enquirer";
 import { validate } from "./deps/npmName";
-import { rimraf } from "./deps/rimraf";
 import { getPackageRoot } from "./deps/package";
+import { deleteFolder, readInput } from "easier-node";
 
 const escapeRegExp = (str: string): string => {
   return str.replace(/[$()*+.?[\\\]^{|}]/g, "\\$&"); // $& means the whole matched string
@@ -17,7 +16,7 @@ const main = async () => {
   const projectRoot = await getPackageRoot();
 
   const directoryName = projectRoot.slice(path.dirname(projectRoot).length + 1);
-  let initial: string | undefined = validate(directoryName).valid
+  const initial: string | undefined = validate(directoryName).valid
     ? directoryName
     : undefined;
   let result: string | undefined;
@@ -30,13 +29,12 @@ const main = async () => {
       }
     }
 
-    const { value } = await prompt<{ value: string }>({
-      type: "input",
-      name: "value",
-      message: "npm package name?",
-      initial,
-    });
-    initial = undefined;
+    const input = await readInput(`npm package name? [${initial}]`);
+    let value = input.trim();
+    if (value === "" && initial) {
+      value = initial;
+    }
+
     result = value.trim();
     validateResult = validate(result);
   } while (!validateResult.valid || result.includes("/"));
@@ -62,7 +60,7 @@ const main = async () => {
   try {
     // should only run on first name
     if (currentName === `npm${"-"}lib${"-"}name`) {
-      await rimraf(path.join(projectRoot, ".git"));
+      await deleteFolder(path.join(projectRoot, ".git"));
       execSync(
         "git init && git add . && git commit -m 'Initial commit from just-build'",
         {
