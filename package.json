@@ -34,7 +34,6 @@
     "@typescript-eslint/parser": "^5.13.0",
     "enquirer": "^2.3.6",
     "esbuild": "^0.14.11",
-    "esbuild-runner": "^2.2.1",
     "eslint": "^8.6.0",
     "eslint-config-prettier": "^8.5.0",
     "eslint-plugin-prettier": "^4.0.0",
