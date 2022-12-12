@@ -27,6 +27,8 @@ const main = async () => {
   const tsConfig = readJSON<TSConfig>(fileContent);
 
   const tsc = async (config: TSConfig) => {
+    tsConfig.compilerOptions.noEmit = false;
+
     await fs.writeFile(path.join(projectRoot, "tsconfig.tmp.json"), JSON.stringify(config));
 
     return new Promise<void>((resolve, reject) => {
@@ -47,7 +49,10 @@ const main = async () => {
   ensureEmptyFolderExists(path.join(projectRoot, "dist"));
 
   if (SHOULD_BUILD_CLI) {
-    await build("./cli/index.ts");
+    const entryPoint = await build("./cli/index.ts", ".xnrb");
+    if (entryPoint) {
+      await fs.chmod(entryPoint, 0o755);
+    }
   }
 
   if (SHOULD_BUILD_LIB) {
@@ -56,9 +61,9 @@ const main = async () => {
       compilerOptions: {
         ...tsConfig.compilerOptions,
         outDir: "dist/cjs",
-        noEmit: false,
       },
       include: ["lib/**/*"],
+      exclude: ["**/*.test.ts"],
     });
 
     await tsc({
@@ -68,9 +73,9 @@ const main = async () => {
         outDir: "dist/esm",
         module: "ES2020",
         moduleResolution: "node",
-        noEmit: false,
       },
       include: ["lib/**/*"],
+      exclude: ["**/*.test.ts"],
     });
   }
 
