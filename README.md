@@ -7,7 +7,9 @@
 - cli
   - boilerplate to wire a cli to a lib
 
-This is not a [node app starter](https://github.com/mrwade/ultimate-node-stack), a [web app starter](https://github.com/withastro/astro), or a [hybrid starter](https://github.com/vercel/next.js/).
+This is not a [node app starter](https://github.com/mrwade/ultimate-node-stack), a
+[web app starter](https://github.com/withastro/astro), or a
+[hybrid starter](https://github.com/vercel/next.js/).
 
 # Name project
 
@@ -24,12 +26,12 @@ npx xnr .scripts/name.ts
 
 Dev environment requires:
 
-- node 10+
+- node >= 16.11
 - npm >= 5.2.0
 
-Output code is ES6 and targets:
+Output code targets node 16.11+:
 
-- node 10+
+- node >= 16.11
 - All major non-dead browsers (>93%)
 
 <!--

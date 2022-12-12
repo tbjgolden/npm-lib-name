@@ -16,9 +16,7 @@ const main = async () => {
   const projectRoot = await getPackageRoot();
 
   const directoryName = projectRoot.slice(path.dirname(projectRoot).length + 1);
-  const initial: string | undefined = validate(directoryName).valid
-    ? directoryName
-    : undefined;
+  const initial: string | undefined = validate(directoryName).valid ? directoryName : undefined;
   let result: string | undefined;
   let validateResult: ReturnType<typeof validate> | undefined;
 
@@ -61,12 +59,9 @@ const main = async () => {
     // should only run on first name
     if (currentName === `npm${"-"}lib${"-"}name`) {
       await deleteFolder(path.join(projectRoot, ".git"));
-      execSync(
-        "git init && git add . && git commit -m 'Initial commit from just-build'",
-        {
-          cwd: projectRoot,
-        }
-      );
+      execSync("git init && git add . && git commit -m 'Initial commit from just-build'", {
+        cwd: projectRoot,
+      });
       console.log("New git repo created");
       execSync("npx simple-git-hooks", {
         cwd: projectRoot,

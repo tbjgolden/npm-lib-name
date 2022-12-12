@@ -27,10 +27,7 @@ const main = async () => {
   const tsConfig = readJSON<TSConfig>(fileContent);
 
   const tsc = async (config: TSConfig) => {
-    await fs.writeFile(
-      path.join(projectRoot, "tsconfig.tmp.json"),
-      JSON.stringify(config)
-    );
+    await fs.writeFile(path.join(projectRoot, "tsconfig.tmp.json"), JSON.stringify(config));
 
     return new Promise<void>((resolve, reject) => {
       const child = fork("./node_modules/.bin/tsc", ["--project", "tsconfig.tmp.json"], {
