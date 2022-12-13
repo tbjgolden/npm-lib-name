@@ -1,9 +1,8 @@
-/* eslint-disable no-console */
 import fs from "node:fs/promises";
 import path from "node:path";
 import { fork } from "node:child_process";
 import { build } from "xnr";
-import { getPackageRoot } from "./deps/package";
+import { getPackageRoot } from "./lib/package";
 import {
   readJSON,
   ensureEmptyFolderExists,

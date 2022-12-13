@@ -1,9 +1,8 @@
-/* eslint-disable no-console */
 import fs from "node:fs";
 import path from "node:path";
 import { execSync } from "node:child_process";
-import { validate } from "./deps/npmName";
-import { getPackageRoot } from "./deps/package";
+import { validate } from "./lib/npmName";
+import { getPackageRoot } from "./lib/package";
 import { deleteFolder, readInput } from "easier-node";
 
 const escapeRegExp = (str: string): string => {

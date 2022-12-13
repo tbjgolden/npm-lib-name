@@ -58,7 +58,7 @@
   },
   "lint-staged": {
     "*.ts": [
-      "eslint -c .eslintrc.cjs --cache --fix --max-warnings=0 --rule 'no-console: error'",
+      "eslint -c .eslintrc.cjs --cache --fix --max-warnings=0",
       "prettier --ignore-path .gitignore --write"
     ],
     "*.{js,cjs,mjs,json}": [

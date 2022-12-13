@@ -30,7 +30,7 @@ module.exports = {
   rules: {
     "arrow-body-style": "off",
     "no-array-constructor": "off",
-    "no-console": "warn",
+    "no-console": "error",
     "@typescript-eslint/no-unused-vars": [
       "error",
       {
@@ -64,6 +64,7 @@ module.exports = {
     ],
     "unicorn/prefer-switch": ["error", { minimumCases: 5 }],
     "unicorn/no-new-array": "off",
+    "unicorn/no-await-expression-member": "off",
   },
   overrides: [
     {
@@ -71,6 +72,13 @@ module.exports = {
       rules: {
         "unicorn/prefer-module": "off",
         "@typescript-eslint/no-var-requires": "off",
+      },
+    },
+    {
+      files: [".scripts/**/*.ts"],
+      rules: {
+        "no-console": "off",
+        "unicorn/no-process-exit": "off",
       },
     },
   ],
