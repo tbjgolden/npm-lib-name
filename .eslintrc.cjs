@@ -31,6 +31,7 @@ module.exports = {
     "arrow-body-style": "off",
     "no-array-constructor": "off",
     "no-console": "error",
+    "no-empty": ["error", { allowEmptyCatch: true }],
     "@typescript-eslint/no-unused-vars": [
       "error",
       {
