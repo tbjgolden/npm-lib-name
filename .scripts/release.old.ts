@@ -1,4 +1,4 @@
-import { execSync, exec } from "node:child_process";
+import { execSync } from "node:child_process";
 import { dnsLookup, isFile, readFile } from "easier-node";
 import { firstIsBefore, parseVersion, Version } from "./lib/version";
 import { getPackageRoot, getPackageJson } from "./lib/package";
@@ -8,108 +8,16 @@ if (process.cwd() !== (await getPackageRoot())) {
   process.exit(1);
 }
 
-/*
-- [x] check up to date with git
-- [ ] perform custom validate checks
-- ...
-- [ ] final manual sanity checks
-- [x] calculate next version
-  - ...
-- [ ] publish step
-  - reverse engineer np
-*/
-
-console.log("checking if up to date...");
+// Run build
+console.log("building...");
 {
-  execSync("git fetch --all --prune");
-  const statusStdout = execSync("git --no-optional-locks status --porcelain=2 --branch").toString();
-  const hasPendingFiles = statusStdout
-    .split("\n")
-    .some((line) => Boolean(line) && !line.startsWith("# "));
-  if (hasPendingFiles) {
-    console.log("local has uncommitted files");
-    process.exit(1);
-  }
-  const isUpToDateWithRemote = statusStdout.includes("\n# branch.ab +0 -0");
-  console.log(isUpToDateWithRemote);
-  if (!isUpToDateWithRemote) {
-    console.log("local is not level with remote");
-    process.exit(1);
-  }
+  execSync("npm run build", { stdio: "inherit" });
 }
 
-console.log("");
-console.log("validating package.json...");
-console.log("");
-const packageJson = await getPackageJson();
-
-const hasNonDevDependencies =
-  Object.keys(packageJson.dependencies ?? {}).length > 0 ||
-  Object.keys(packageJson.peerDependencies ?? {}).length > 0 ||
-  Object.keys(packageJson.optionalDependencies ?? {}).length > 0;
-const hasDevDependencies = Object.keys(packageJson.devDependencies ?? {}).length > 0;
-const hasSpecifiedEngineNode = Boolean(packageJson.engines?.node);
-const hasSpecifiedFiles = packageJson.files !== undefined;
-const hasTestScript =
-  packageJson?.scripts?.test !== undefined &&
-  !packageJson.scripts.test.includes("no test specified");
-const hasEnoughKeywords = packageJson.keywords !== undefined && packageJson.keywords.length >= 8;
-const hasAUsefulReadme = (await isFile("README.md")) && (await readFile("README.md")).length >= 800;
-
-const errors: string[] = [];
-const warnings: string[] = [];
-
-if (!hasSpecifiedEngineNode) {
-  errors.push(`package.json should specify the node version it is compatible with`);
-}
-if (!hasSpecifiedFiles) {
-  errors.push(`package.json should include a files array`);
-}
-if (!hasTestScript) {
-  errors.push(`package.json should include a test script`);
-}
-if (!hasEnoughKeywords) {
-  errors.push(`package.json should have at least 8 keywords`);
-}
-if (!hasAUsefulReadme) {
-  errors.push(`package.json should have a README.md (with 800+ chars)`);
-}
-const errorMessage = "";
-const hasNpmVulnerabilites = await new Promise((resolve) => {
-  exec("npm audit", (err, stdout, stderr) => {
-    console.log({
-      stdout,
-      stderr,
-    });
-    resolve(err ? true : false);
-  });
-});
-if (hasNpmVulnerabilites) {
-  errors.push(`npm dependencies contain vulnerabilities:${errorMessage}`);
-}
-
-if (!hasDevDependencies) {
-  warnings.push(`package.json should probably have dev dependencies`);
-}
-if (!hasNonDevDependencies) {
-  warnings.push(`package.json should probably have dependencies`);
-}
-
-// - has example usage
-// - ensures it is up to date with remote
-
-// - checks the running node and npm versions match engines
-// - reinstalls dependencies to ensure your project passes tests with the latest dep tree
-// - if has remote github url, opens a prefilled GitHub Releases draft after publish
-
-if (errors.length > 0) {
-  console.log(`ERRORS:\n${errors.join("\n")}`);
-}
-if (warnings.length > 0) {
-  console.log(`WARNINGS:\n${warnings.join("\n")}`);
-}
-if (errors.length > 0) {
-  process.exit(1);
+// Run test
+console.log("testing...");
+{
+  execSync("npm run coverage", { stdio: "inherit" });
 }
 
 // Use semantic release to generate sensible version
@@ -201,6 +109,72 @@ let nextVersion: string;
     nextVersion = `${currVersion.major}.${currVersion.minor}.${currVersion.patch + 1}`;
   }
   console.log(nextVersion);
+}
+
+console.log("");
+console.log("validating package.json...");
+console.log("");
+const packageJson = await getPackageJson();
+
+const hasNewVersion = packageJson.version === nextVersion;
+const hasNonDevDependencies =
+  Object.keys(packageJson.dependencies ?? {}).length > 0 ||
+  Object.keys(packageJson.peerDependencies ?? {}).length > 0 ||
+  Object.keys(packageJson.optionalDependencies ?? {}).length > 0;
+const hasDevDependencies = Object.keys(packageJson.devDependencies ?? {}).length > 0;
+const hasSpecifiedEngineNode = Boolean(packageJson.engines?.node);
+const hasSpecifiedFiles = packageJson.files !== undefined;
+const hasTestScript =
+  packageJson?.scripts?.test !== undefined &&
+  !packageJson.scripts.test.includes("no test specified");
+const hasEnoughKeywords = packageJson.keywords !== undefined && packageJson.keywords.length >= 8;
+
+const hasAUsefulReadme = (await isFile("README.md")) && (await readFile("README.md")).length >= 800;
+
+const errors: string[] = [];
+const warnings: string[] = [];
+
+if (!hasNewVersion) {
+  errors.push(`package.json version needs to be updated to ${nextVersion}`);
+}
+if (!hasSpecifiedEngineNode) {
+  errors.push(`package.json should specify the node version it is compatible with`);
+}
+if (!hasSpecifiedFiles) {
+  errors.push(`package.json should include a files array`);
+}
+if (!hasTestScript) {
+  errors.push(`package.json should include a test script`);
+}
+if (!hasEnoughKeywords) {
+  errors.push(`package.json should have at least 8 keywords`);
+}
+if (!hasAUsefulReadme) {
+  errors.push(`package.json should have a README.md (with 800+ chars)`);
+}
+
+if (!hasDevDependencies) {
+  warnings.push(`package.json should probably have dev dependencies`);
+}
+if (!hasNonDevDependencies) {
+  warnings.push(`package.json should probably have dependencies`);
+}
+
+// - has example usage
+// - ensures it is up to date with remote
+
+// - checks the running node and npm versions match engines
+// - reinstalls dependencies to ensure your project passes tests with the latest dep tree
+// - if has remote github url, opens a prefilled GitHub Releases draft after publish
+
+if (errors.length > 0) {
+  console.log(`ERRORS:\n${errors.join("\n")}`);
+}
+if (warnings.length > 0) {
+  console.log(`WARNINGS:\n${warnings.join("\n")}`);
+}
+if (errors.length > 0) {
+  process.exit(1);
 }
 
 // suggest untestable final sanity checklist

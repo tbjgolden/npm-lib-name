@@ -28,6 +28,7 @@ Dev environment requires:
 
 - node >= 16.11
 - npm >= 5.2.0
+- git >= 2.11
 
 Output code targets node 16.11+:
 
