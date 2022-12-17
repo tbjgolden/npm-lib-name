@@ -1,5 +1,5 @@
 import { execSync } from "node:child_process";
-import { dnsLookup } from "easier-node";
+import { dnsLookup, isFile, readFile } from "easier-node";
 import { firstIsBefore, parseVersion, Version } from "./lib/version";
 import { getPackageRoot, getPackageJson } from "./lib/package";
 
@@ -129,6 +129,8 @@ const hasTestScript =
   !packageJson.scripts.test.includes("no test specified");
 const hasEnoughKeywords = packageJson.keywords !== undefined && packageJson.keywords.length >= 8;
 
+const hasAUsefulReadme = (await isFile("README.md")) && (await readFile("README.md")).length >= 800;
+
 const errors: string[] = [];
 const warnings: string[] = [];
 
@@ -147,6 +149,9 @@ if (!hasTestScript) {
 if (!hasEnoughKeywords) {
   errors.push(`package.json should have at least 8 keywords`);
 }
+if (!hasAUsefulReadme) {
+  errors.push(`package.json should have a README.md (with 800+ chars)`);
+}
 
 if (!hasDevDependencies) {
   warnings.push(`package.json should probably have dev dependencies`);
@@ -154,6 +159,16 @@ if (!hasDevDependencies) {
 if (!hasNonDevDependencies) {
   warnings.push(`package.json should probably have dependencies`);
 }
+
+// - verify the there is a version tag for the nextVersion
+// - check that there are no unpushed local changes
+// - checks you are on the right branch
+// - has example usage
+// - ensures you are publishing from main
+// - ensures it is up to date with remote
+// - checks the running node and npm versions match engines
+// - reinstalls dependencies to ensure your project passes tests with the latest dep tree
+// - if has remote github url, opens a prefilled GitHub Releases draft after publish
 
 if (errors.length > 0) {
   console.log(`ERRORS:\n${errors.join("\n")}`);
@@ -164,18 +179,6 @@ if (warnings.length > 0) {
 if (errors.length > 0) {
   process.exit(1);
 }
-
-// run sanity checks
-// - A README that is at least 100 characters long
-// - verify the there is a version tag for the nextVersion
-// - check that there are no unpushed local changes
-// - checks you are on the right branch
-// - has example usage
-// - ensures you are publishing from main
-// - ensures it is up to date with remote
-// - checks the running node and npm versions match engines
-// - reinstalls dependencies to ensure your project passes tests with the latest dep tree
-// - if has remote github url, opens a prefilled GitHub Releases draft after publish
 
 // suggest untestable final sanity checklist
 // - readme updates?
