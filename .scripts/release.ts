@@ -232,25 +232,23 @@ await writeFile(
 );
 
 /*
-- update package.json version
-- remove node_modules
-- npm install --engine-strict
-- npm run build
-  - if MIT (or GPL or Apache), add attribution comment match with package.json
-- npm run check-build
-- npm run coverage
+- [x] update package.json version
+- [ ] remove node_modules
+- [ ] npm install --engine-strict
+- [ ] npm run build
+  - update build to attach licence attribution comment
+- [ ] npm run check-build
+    - cli simulate a npm package locally, run with npx and check if results are right
+    - api simulate a npm package locally and if ts-types work
+- [ ] npm run coverage
 - at this point, there's no place for the release to fail
-- perform the final modifications
+- perform the final modifications (and ignore Ctrl-C / other kills)
   - git add .
   - git commit -m 'release'
   - git tag
   - git push commit
   - git push tag
+  - npm publish
 */
-
-console.log(nextVersion);
-
-// cli: simulate a npm package locally, run with npx and check if results are right
-// api: simulate a npm package locally and if ts-types work
 
 // run npm release
