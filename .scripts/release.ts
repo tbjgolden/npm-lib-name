@@ -5,13 +5,10 @@ import { getPackageRoot, getPackageJson } from "./lib/package";
 
 /*
 - [x] check up to date with git
-- [ ] perform custom validate checks
-- ...
-- [ ] final manual sanity checks
+- [x] perform custom validate checks
 - [x] calculate next version
-  - ...
+- [x] final manual sanity checks
 - [ ] build
-  - [ ] if MIT (or GPL or Apache), add attribution comment match with package.json
 - [ ] validate build
   - [ ] tests
 - [ ] publish step
@@ -200,32 +197,37 @@ let nextVersion: string;
 }
 
 // suggest untestable final sanity checklist
-
-console.log(`Final checklist:
-
+console.log(`Final checklist:`);
+console.log(`
 - do you need to update the readme?
 - would anything be better as a peer dep?
 - are the examples in the readme examples for cli/api also unit tests?
 `);
 for (let i = 5; i >= 1; i--) {
-  await delay(1000);
   process.stdout.write(i + "…");
+  await delay(1000);
 }
 const answer = await readInput(`release ${nextVersion}? [N/y]`);
 if (answer.trim().toLowerCase() !== "y") {
   process.exit(1);
 }
 
-// build
+// actually run the deploy
 /*
 - update package.json version
 - remove node_modules
 - npm install --engine-strict
 - npm run build
+  - if MIT (or GPL or Apache), add attribution comment match with package.json
+- npm run check-build
 - npm run coverage
-- convert convert 
-- build healthcheck
-
+- at this point, there's no place for the release to fail
+- perform the final modifications
+  - git add .
+  - git commit -m 'release'
+  - git tag
+  - git push commit
+  - git push tag
 */
 
 console.log(nextVersion);
