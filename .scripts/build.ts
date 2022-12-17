@@ -1,17 +1,19 @@
 import fs from "node:fs/promises";
-import path from "node:path";
 import { fork } from "node:child_process";
 import { build } from "xnr";
-import { getPackageRoot } from "./lib/package";
 import {
   readJSON,
   ensureEmptyFolderExists,
   copyFolderContentsToFolder,
   deleteFolder,
+  isFile,
+  readFile,
+  writeFile,
 } from "easier-node";
+import { checkDirectory } from "./lib/checkDirectory";
 
-const SHOULD_BUILD_CLI = true;
-const SHOULD_BUILD_LIB = true;
+const SHOULD_BUILD_CLI = await isFile("cli/index.ts");
+const SHOULD_BUILD_LIB = await isFile("lib/index.ts");
 
 type TSConfig = {
   compilerOptions: {
@@ -21,21 +23,20 @@ type TSConfig = {
 };
 
 const main = async () => {
-  const projectRoot = await getPackageRoot();
-  const fileContent = await fs.readFile(path.join(projectRoot, "tsconfig.json"), "utf8");
+  await checkDirectory();
+
+  const fileContent = await readFile("tsconfig.json");
   const tsConfig = readJSON<TSConfig>(fileContent);
 
   const tsc = async (config: TSConfig) => {
     tsConfig.compilerOptions.noEmit = false;
 
-    await fs.writeFile(path.join(projectRoot, "tsconfig.tmp.json"), JSON.stringify(config));
+    await writeFile("tsconfig.tmp.json", JSON.stringify(config));
 
     return new Promise<void>((resolve, reject) => {
-      const child = fork("./node_modules/.bin/tsc", ["--project", "tsconfig.tmp.json"], {
-        cwd: projectRoot,
-      });
+      const child = fork("./node_modules/.bin/tsc", ["--project", "tsconfig.tmp.json"]);
       child.on("exit", async (code) => {
-        await fs.unlink(path.join(projectRoot, "tsconfig.tmp.json"));
+        await fs.unlink("tsconfig.tmp.json");
         if (code) {
           reject(new Error(`Error code: ${code}`));
         } else {
@@ -45,7 +46,7 @@ const main = async () => {
     });
   };
 
-  ensureEmptyFolderExists(path.join(projectRoot, "dist"));
+  ensureEmptyFolderExists("dist");
 
   if (SHOULD_BUILD_CLI) {
     const entryPoint = await build("./cli/index.ts", ".xnrb");

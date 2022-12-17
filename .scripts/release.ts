@@ -1,5 +1,5 @@
 import { execSync, exec } from "node:child_process";
-import { delay, dnsLookup, isFile, readFile, readInput } from "easier-node";
+import { delay, dnsLookup, isFile, readFile, readInput, writeFile } from "easier-node";
 import { firstIsBefore, parseVersion } from "./lib/version";
 import { getPackageRoot, getPackageJson } from "./lib/package";
 
@@ -64,8 +64,14 @@ if (
 if (packageJson.keywords === undefined || packageJson.keywords.length < 7) {
   errors.push(`package.json should have at least 7 keywords`);
 }
+if ((packageJson.description?.length ?? 0) < 10) {
+  errors.push(`package.json should have a short description`);
+}
+if (packageJson.license === undefined) {
+  errors.push(`package.json needs a licence`);
+}
 if (!(await isFile("README.md")) || (await readFile("README.md")).length < 800) {
-  errors.push(`package.json should have a README.md (with 800+ chars)`);
+  errors.push(`project should contain a README.md (with 800+ chars)`);
 }
 const npmVulnerabilites = await new Promise<string>((resolve) => {
   exec("npm audit", (err, stdout) => {
@@ -213,6 +219,18 @@ if (answer.trim().toLowerCase() !== "y") {
 }
 
 // actually run the deploy
+await writeFile(
+  "package.json",
+  JSON.stringify(
+    {
+      ...packageJson,
+      version: nextVersion,
+    },
+    null,
+    2
+  )
+);
+
 /*
 - update package.json version
 - remove node_modules
