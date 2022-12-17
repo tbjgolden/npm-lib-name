@@ -1,12 +1,7 @@
 import { execSync, exec } from "node:child_process";
-import { dnsLookup, isFile, readFile } from "easier-node";
+import { dnsLookup, isFile, readFile, readInput } from "easier-node";
 import { firstIsBefore, parseVersion, Version } from "./lib/version";
 import { getPackageRoot, getPackageJson } from "./lib/package";
-
-if (process.cwd() !== (await getPackageRoot())) {
-  console.log("plz run from package root");
-  process.exit(1);
-}
 
 /*
 - [x] check up to date with git
@@ -19,13 +14,17 @@ if (process.cwd() !== (await getPackageRoot())) {
   - reverse engineer np
 */
 
-console.log("checking if up to date...");
+// preconditions
 {
+  if (process.cwd() !== (await getPackageRoot())) {
+    console.log("must be run from package root");
+    process.exit(1);
+  }
   execSync("git fetch --all --prune");
   const statusStdout = execSync("git --no-optional-locks status --porcelain=2 --branch").toString();
   const isPointingAtRemoteMain = statusStdout.includes("\n# branch.upstream origin/main");
   if (!isPointingAtRemoteMain) {
-    console.log("local branch must have main as its upstream branch");
+    console.log("can only release from main (with origin/main as upstream)");
     process.exit(1);
   }
   const hasPendingFiles = statusStdout
@@ -42,11 +41,8 @@ console.log("checking if up to date...");
   }
 }
 
-console.log("");
-console.log("validating package.json...");
-console.log("");
+// custom validation
 const packageJson = await getPackageJson();
-
 const hasNonDevDependencies =
   Object.keys(packageJson.dependencies ?? {}).length > 0 ||
   Object.keys(packageJson.peerDependencies ?? {}).length > 0 ||
@@ -99,11 +95,9 @@ if (!hasNonDevDependencies) {
   warnings.push(`package.json should probably have dependencies`);
 }
 
-// - has example usage
-// - ensures it is up to date with remote
-
+// - standardised readme format / that can be checked? e.g. has example usage, fixed titles
 // - checks the running node and npm versions match engines
-// - reinstalls dependencies to ensure your project passes tests with the latest dep tree
+//   - i.e. just rm deps, and install them with --engine-strict
 // - if has remote github url, opens a prefilled GitHub Releases draft after publish
 
 if (errors.length > 0) {
@@ -114,6 +108,13 @@ if (warnings.length > 0) {
 }
 if (errors.length > 0) {
   process.exit(1);
+}
+
+if (warnings.length > 0) {
+  const answer = await readInput("Some warnings - continue anyway? [N/y]");
+  if (answer.trim().toLowerCase() !== "y") {
+    process.exit(1);
+  }
 }
 
 // Use semantic release to generate sensible version
