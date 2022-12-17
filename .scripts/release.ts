@@ -31,7 +31,6 @@ console.log("checking if up to date...");
     process.exit(1);
   }
   const isUpToDateWithRemote = statusStdout.includes("\n# branch.ab +0 -0");
-  console.log(isUpToDateWithRemote);
   if (!isUpToDateWithRemote) {
     console.log("local is not level with remote");
     process.exit(1);
@@ -74,18 +73,18 @@ if (!hasEnoughKeywords) {
 if (!hasAUsefulReadme) {
   errors.push(`package.json should have a README.md (with 800+ chars)`);
 }
-const errorMessage = "";
-const hasNpmVulnerabilites = await new Promise((resolve) => {
-  exec("npm audit", (err, stdout, stderr) => {
-    console.log({
-      stdout,
-      stderr,
-    });
-    resolve(err ? true : false);
+const npmVulnerabilites = await new Promise<string>((resolve) => {
+  exec("npm audit", (err, stdout) => {
+    resolve(err ? stdout.trim() : "");
   });
 });
-if (hasNpmVulnerabilites) {
-  errors.push(`npm dependencies contain vulnerabilities:${errorMessage}`);
+if (npmVulnerabilites) {
+  errors.push(
+    `npm dependencies contain vulnerabilities:\n${npmVulnerabilites
+      .split("\n")
+      .map((line) => `  │ ${line}`)
+      .join("\n")}`
+  );
 }
 
 if (!hasDevDependencies) {
@@ -103,10 +102,10 @@ if (!hasNonDevDependencies) {
 // - if has remote github url, opens a prefilled GitHub Releases draft after publish
 
 if (errors.length > 0) {
-  console.log(`ERRORS:\n${errors.join("\n")}`);
+  console.log(`ERRORS:\n${errors.map((message) => `- ${message}`).join("\n")}`);
 }
 if (warnings.length > 0) {
-  console.log(`WARNINGS:\n${warnings.join("\n")}`);
+  console.log(`WARNINGS:\n${warnings.map((message) => `- ${message}`).join("\n")}`);
 }
 if (errors.length > 0) {
   process.exit(1);
