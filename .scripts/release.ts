@@ -23,6 +23,11 @@ console.log("checking if up to date...");
 {
   execSync("git fetch --all --prune");
   const statusStdout = execSync("git --no-optional-locks status --porcelain=2 --branch").toString();
+  const isPointingAtRemoteMain = statusStdout.includes("\n# branch.upstream origin/main");
+  if (!isPointingAtRemoteMain) {
+    console.log("local branch must have main as its upstream branch");
+    process.exit(1);
+  }
   const hasPendingFiles = statusStdout
     .split("\n")
     .some((line) => Boolean(line) && !line.startsWith("# "));
