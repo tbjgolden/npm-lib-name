@@ -1,6 +1,6 @@
 import { execSync, exec } from "node:child_process";
-import { dnsLookup, isFile, readFile, readInput } from "easier-node";
-import { firstIsBefore, parseVersion, Version } from "./lib/version";
+import { delay, dnsLookup, isFile, readFile, readInput } from "easier-node";
+import { firstIsBefore, parseVersion } from "./lib/version";
 import { getPackageRoot, getPackageJson } from "./lib/package";
 
 /*
@@ -10,6 +10,10 @@ import { getPackageRoot, getPackageJson } from "./lib/package";
 - [ ] final manual sanity checks
 - [x] calculate next version
   - ...
+- [ ] build
+  - [ ] if MIT (or GPL or Apache), add attribution comment match with package.json
+- [ ] validate build
+  - [ ] tests
 - [ ] publish step
   - reverse engineer np
 */
@@ -25,53 +29,45 @@ import { getPackageRoot, getPackageJson } from "./lib/package";
   const isPointingAtRemoteMain = statusStdout.includes("\n# branch.upstream origin/main");
   if (!isPointingAtRemoteMain) {
     console.log("can only release from main (with origin/main as upstream)");
-    process.exit(1);
+    // process.exit(1);
   }
   const hasPendingFiles = statusStdout
     .split("\n")
     .some((line) => Boolean(line) && !line.startsWith("# "));
   if (hasPendingFiles) {
     console.log("local has uncommitted files");
-    process.exit(1);
+    // process.exit(1);
   }
   const isUpToDateWithRemote = statusStdout.includes("\n# branch.ab +0 -0");
   if (!isUpToDateWithRemote) {
     console.log("local is not level with remote");
-    process.exit(1);
+    // process.exit(1);
   }
 }
 
 // custom validation
-const packageJson = await getPackageJson();
-const hasNonDevDependencies =
-  Object.keys(packageJson.dependencies ?? {}).length > 0 ||
-  Object.keys(packageJson.peerDependencies ?? {}).length > 0 ||
-  Object.keys(packageJson.optionalDependencies ?? {}).length > 0;
-const hasDevDependencies = Object.keys(packageJson.devDependencies ?? {}).length > 0;
-const hasSpecifiedEngineNode = Boolean(packageJson.engines?.node);
-const hasSpecifiedFiles = packageJson.files !== undefined;
-const hasTestScript =
-  packageJson?.scripts?.test !== undefined &&
-  !packageJson.scripts.test.includes("no test specified");
-const hasEnoughKeywords = packageJson.keywords !== undefined && packageJson.keywords.length >= 8;
-const hasAUsefulReadme = (await isFile("README.md")) && (await readFile("README.md")).length >= 800;
-
 const errors: string[] = [];
 const warnings: string[] = [];
 
-if (!hasSpecifiedEngineNode) {
+const packageJson = await getPackageJson();
+
+// validation errors
+if (!packageJson.engines?.node) {
   errors.push(`package.json should specify the node version it is compatible with`);
 }
-if (!hasSpecifiedFiles) {
+if (packageJson.files === undefined) {
   errors.push(`package.json should include a files array`);
 }
-if (!hasTestScript) {
+if (
+  packageJson?.scripts?.test === undefined ||
+  packageJson.scripts.test.includes("no test specified")
+) {
   errors.push(`package.json should include a test script`);
 }
-if (!hasEnoughKeywords) {
-  errors.push(`package.json should have at least 8 keywords`);
+if (packageJson.keywords === undefined || packageJson.keywords.length < 7) {
+  errors.push(`package.json should have at least 7 keywords`);
 }
-if (!hasAUsefulReadme) {
+if (!(await isFile("README.md")) || (await readFile("README.md")).length < 800) {
   errors.push(`package.json should have a README.md (with 800+ chars)`);
 }
 const npmVulnerabilites = await new Promise<string>((resolve) => {
@@ -88,23 +84,29 @@ if (npmVulnerabilites) {
   );
 }
 
-if (!hasDevDependencies) {
+// validation warnings
+if (Object.keys(packageJson.devDependencies ?? {}).length === 0) {
   warnings.push(`package.json should probably have dev dependencies`);
 }
-if (!hasNonDevDependencies) {
+if (
+  !(
+    Object.keys(packageJson.dependencies ?? {}).length > 0 ||
+    Object.keys(packageJson.peerDependencies ?? {}).length > 0 ||
+    Object.keys(packageJson.optionalDependencies ?? {}).length > 0
+  )
+) {
   warnings.push(`package.json should probably have dependencies`);
 }
 
 // - standardised readme format / that can be checked? e.g. has example usage, fixed titles
-// - checks the running node and npm versions match engines
-//   - i.e. just rm deps, and install them with --engine-strict
-// - if has remote github url, opens a prefilled GitHub Releases draft after publish
 
 if (errors.length > 0) {
   console.log(`ERRORS:\n${errors.map((message) => `- ${message}`).join("\n")}`);
+  console.log();
 }
 if (warnings.length > 0) {
   console.log(`WARNINGS:\n${warnings.map((message) => `- ${message}`).join("\n")}`);
+  console.log();
 }
 if (errors.length > 0) {
   process.exit(1);
@@ -115,40 +117,30 @@ if (warnings.length > 0) {
   if (answer.trim().toLowerCase() !== "y") {
     process.exit(1);
   }
+  console.log();
 }
 
-// Use semantic release to generate sensible version
-console.log("");
-console.log("getting prev version...");
-console.log("");
-let currVersion: Version;
+// calculating next version using semantic release principles
+let nextVersion: string;
 {
   let currVersionStr: string;
   try {
     currVersionStr = execSync(`npm show 'npm-lib-name' version`, {
       stdio: ["ignore", "pipe", "ignore"],
     }).toString();
-    console.log(currVersionStr);
   } catch {
     // this dns lookup checks if they have internet
     if (await dnsLookup("https://example.com")) {
       currVersionStr = "0.0.0-new";
-      console.log("package does not yet exist");
     } else {
       console.log("error determining latest version of npm-lib-name on npm registry");
       process.exit(1);
     }
   }
-  currVersion = parseVersion(currVersionStr);
-}
+  const currVersion = parseVersion(currVersionStr);
 
-type Commit = { hash: string; message: string; footer: string };
+  type Commit = { hash: string; message: string; footer: string };
 
-console.log("");
-console.log("calculating next version...");
-console.log("");
-let nextVersion: string;
-{
   // get all commits with hashes, messages and footers
   const rawGitLogStr = execSync(`git --no-pager log --format=format:'%H$%n%B'`).toString();
   const matches = [...rawGitLogStr.matchAll(/(?<=^|\n)[\da-f]{40}(?=\$\n)/g)];
@@ -205,17 +197,40 @@ let nextVersion: string;
   } else {
     nextVersion = `${currVersion.major}.${currVersion.minor}.${currVersion.patch + 1}`;
   }
-  console.log(nextVersion);
 }
 
 // suggest untestable final sanity checklist
-// - readme updates?
-// - would anything be better as a peer dep?
-// - are the readme examples for cli/api also unit tests?
+
+console.log(`Final checklist:
+
+- do you need to update the readme?
+- would anything be better as a peer dep?
+- are the examples in the readme examples for cli/api also unit tests?
+`);
+for (let i = 5; i >= 1; i--) {
+  await delay(1000);
+  process.stdout.write(i + "…");
+}
+const answer = await readInput(`release ${nextVersion}? [N/y]`);
+if (answer.trim().toLowerCase() !== "y") {
+  process.exit(1);
+}
+
+// build
+/*
+- update package.json version
+- remove node_modules
+- npm install --engine-strict
+- npm run build
+- npm run coverage
+- convert convert 
+- build healthcheck
+
+*/
+
+console.log(nextVersion);
 
 // cli: simulate a npm package locally, run with npx and check if results are right
 // api: simulate a npm package locally and if ts-types work
 
 // run npm release
-
-// format:"%H{%s}"

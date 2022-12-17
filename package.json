@@ -12,6 +12,16 @@
     "node": ">=16.14.0",
     "npm": ">=6.8.0"
   },
+  "keywords": [
+    "a",
+    "b",
+    "c",
+    "d",
+    "e",
+    "f",
+    "g",
+    "h"
+  ],
   "scripts": {
     "name": "xnr ./.scripts/name.ts",
     "build": "xnr ./.scripts/build.ts",
