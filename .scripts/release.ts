@@ -160,12 +160,9 @@ if (!hasNonDevDependencies) {
   warnings.push(`package.json should probably have dependencies`);
 }
 
-// - verify the there is a version tag for the nextVersion
-// - check that there are no unpushed local changes
-// - checks you are on the right branch
 // - has example usage
-// - ensures you are publishing from main
 // - ensures it is up to date with remote
+
 // - checks the running node and npm versions match engines
 // - reinstalls dependencies to ensure your project passes tests with the latest dep tree
 // - if has remote github url, opens a prefilled GitHub Releases draft after publish
