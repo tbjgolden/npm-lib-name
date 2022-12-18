@@ -8,7 +8,7 @@ node_modules
 .tmp
 dist
 .xnr
-.xnrb
+/.build.*
 /coverage/*
 !/coverage/coverage-summary.json
 !.scripts

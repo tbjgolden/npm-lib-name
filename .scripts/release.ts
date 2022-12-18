@@ -246,7 +246,10 @@ console.log("final release checks passed... releasing...");
   - [ ] update build to attach licence attribution comment
 - [x] npm run check-build
     - [x] cli simulate a npm package locally, run with npx and check if results are right
-    - [ ] api simulate a npm package locally and if ts-types work
+    - [ ] api
+      - [x] esm check
+      - [ ] cjs check
+      - [ ] types check
 - [x] npm run coverage
 - at this point, there's no place for the release to fail
 - perform the final modifications (and ignore Ctrl-C / other kills)

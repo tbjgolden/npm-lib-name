@@ -66,4 +66,26 @@ if (await isFile("lib/index.ts")) {
       process.exit(1);
     }
   }
+
+  const apiCjsEntryFilePath = packageJson.main;
+
+  if (apiCjsEntryFilePath) {
+    if (!(await isFile(apiCjsEntryFilePath))) {
+      console.log(`"main": "${apiCjsEntryFilePath}" must refer to a file`);
+      process.exit(1);
+    }
+
+    // eslint-disable-next-line @typescript-eslint/no-var-requires, unicorn/prefer-module
+    const { hello } = require(join(process.cwd(), apiCjsEntryFilePath));
+
+    const result = hello("arg1 arg2");
+    const expected = `Hello arg1 arg2!`;
+    if (result !== expected) {
+      console.log("expected:");
+      console.log(JSON.stringify(expected));
+      console.log("actual:");
+      console.log(JSON.stringify(result));
+      process.exit(1);
+    }
+  }
 }
