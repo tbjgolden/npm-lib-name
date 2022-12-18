@@ -1,5 +1,5 @@
 import { execSync, exec } from "node:child_process";
-import { delay, dnsLookup, isFile, readFile, readInput, writeFile } from "easier-node";
+import { delay, dnsLookup, isFile, readFile, readInput, removeAny, writeFile } from "easier-node";
 import { firstIsBefore, parseVersion } from "./lib/version";
 import { getPackageRoot, getPackageJson } from "./lib/package";
 
@@ -230,17 +230,24 @@ await writeFile(
     2
   )
 );
+await removeAny("node_modules");
+execSync("npm install --engine-strict --ignore-scripts", { stdio: "inherit" });
+execSync("npm run build", { stdio: "inherit" });
+execSync("npm run check-build", { stdio: "inherit" });
+execSync("npm run coverage", { stdio: "inherit" });
+
+console.log("final release checks passed... releasing...");
 
 /*
 - [x] update package.json version
-- [ ] remove node_modules
-- [ ] npm install --engine-strict
-- [ ] npm run build
-  - update build to attach licence attribution comment
-- [ ] npm run check-build
-    - cli simulate a npm package locally, run with npx and check if results are right
-    - api simulate a npm package locally and if ts-types work
-- [ ] npm run coverage
+- [x] remove node_modules
+- [x] npm install --engine-strict
+- [x] npm run build
+  - [ ] update build to attach licence attribution comment
+- [x] npm run check-build
+    - [x] cli simulate a npm package locally, run with npx and check if results are right
+    - [ ] api simulate a npm package locally and if ts-types work
+- [x] npm run coverage
 - at this point, there's no place for the release to fail
 - perform the final modifications (and ignore Ctrl-C / other kills)
   - git add .

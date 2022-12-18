@@ -4,6 +4,7 @@ import { execSync } from "node:child_process";
 import { validate } from "./lib/npmName";
 import { getPackageRoot } from "./lib/package";
 import { deleteFolder, readInput } from "easier-node";
+import { checkDirectory } from "./lib/checkDirectory";
 
 const escapeRegExp = (str: string): string => {
   return str.replace(/[$()*+.?[\\\]^{|}]/g, "\\$&"); // $& means the whole matched string
@@ -12,6 +13,8 @@ const escapeRegExp = (str: string): string => {
 const currentName = "npm-lib-name";
 
 const main = async () => {
+  await checkDirectory();
+
   const projectRoot = await getPackageRoot();
 
   const directoryName = projectRoot.slice(path.dirname(projectRoot).length + 1);

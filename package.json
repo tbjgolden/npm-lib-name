@@ -1,6 +1,6 @@
 {
   "name": "npm-lib-name",
-  "version": "0.0.0",
+  "version": "0.1.0",
   "license": "Apache-2.0",
   "main": "dist/cjs/index.js",
   "module": "dist/esm/index.js",
@@ -16,6 +16,7 @@
   "scripts": {
     "name": "xnr ./.scripts/name.ts",
     "build": "xnr ./.scripts/build.ts",
+    "check-build": "xnr ./.scripts/checkBuild.ts",
     "test": "NODE_OPTIONS='--experimental-vm-modules --no-warnings' npx jest",
     "coverage": "NODE_OPTIONS='--experimental-vm-modules --no-warnings' npx jest --coverage",
     "watch": "NODE_OPTIONS='--experimental-vm-modules --no-warnings' npx jest --watch",
