@@ -8,7 +8,6 @@ import {
   isFile,
   readFile,
   writeFile,
-  moveFile,
   listFilesWithinFolder,
   copyFile,
   splitPath,
@@ -89,7 +88,17 @@ const main = async () => {
       if (filePath.endsWith(".js")) {
         const fileName = splitPath(filePath).at(-1) as string;
         const fileNameWithoutExt = fileName.slice(0, -3);
-        await moveFile(`dist/cjs/${filePath}`, `dist/cjs/${fileNameWithoutExt}.cjs`);
+
+        await writeFile(
+          `dist/cjs/${fileNameWithoutExt}.cjs`,
+          (
+            await readFile(`dist/cjs/${filePath}`)
+          ).replace(
+            REQUIRE_REGEX,
+            (_, delim, localPath) => `require(${delim}${localPath}.cjs${delim})`
+          )
+        );
+        await deleteFile(`dist/cjs/${filePath}`);
       }
     }
   }
@@ -119,6 +128,8 @@ const tsc = async (tsConfig: TSConfig) => {
     });
   });
 };
+
+const REQUIRE_REGEX = /\brequire\((["'`])([./].*)\1\)/g;
 
 main().catch((error) => {
   throw error;

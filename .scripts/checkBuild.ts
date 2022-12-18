@@ -40,21 +40,19 @@ if (await isFile("cli/index.ts")) {
 }
 
 if (await isFile("lib/index.ts")) {
-  console.log("validating api...");
+  console.log("validating api (esm)...");
   if (typeof packageJson.module !== "string") {
     console.log("package.json module must be a path to the esm entrypoint");
     process.exit(1);
   }
 
-  const apiEsmEntryFilePath = packageJson.module;
-
-  if (apiEsmEntryFilePath) {
-    if (!(await isFile(apiEsmEntryFilePath))) {
-      console.log(`"module": "${apiEsmEntryFilePath}" must refer to a file`);
+  if (packageJson.module) {
+    if (!(await isFile(packageJson.module))) {
+      console.log(`"module": "${packageJson.module}" must refer to a file`);
       process.exit(1);
     }
 
-    const { hello } = await import(join(process.cwd(), apiEsmEntryFilePath));
+    const { hello } = await import(join(process.cwd(), packageJson.module));
 
     const result = hello("arg1 arg2");
     const expected = `Hello arg1 arg2!`;
@@ -67,26 +65,28 @@ if (await isFile("lib/index.ts")) {
     }
   }
 
-  const apiCjsEntryFilePath = packageJson.main;
+  console.log("validating api (cjs)...");
+  if (typeof packageJson.main !== "string") {
+    console.log("package.json main must be a path to the cjs entrypoint");
+    process.exit(1);
+  }
 
-  if (apiCjsEntryFilePath) {
-    if (!(await isFile(apiCjsEntryFilePath))) {
-      console.log(`"main": "${apiCjsEntryFilePath}" must refer to a file`);
-      process.exit(1);
-    }
+  if (!(await isFile(packageJson.main))) {
+    console.log(`"main": "${packageJson.main}" must refer to a file`);
+    process.exit(1);
+  }
 
-    // eslint-disable-next-line @typescript-eslint/no-var-requires, unicorn/prefer-module
-    const { hello } = require(join(process.cwd(), apiCjsEntryFilePath));
+  // eslint-disable-next-line @typescript-eslint/no-var-requires, unicorn/prefer-module
+  const { hello } = require(join(process.cwd(), packageJson.main));
 
-    const result = hello("arg1 arg2");
-    const expected = `Hello arg1 arg2!`;
-    if (result !== expected) {
-      console.log("expected:");
-      console.log(JSON.stringify(expected));
-      console.log("actual:");
-      console.log(JSON.stringify(result));
-      process.exit(1);
-    }
+  const result = hello("arg1 arg2");
+  const expected = `Hello arg1 arg2!`;
+  if (result !== expected) {
+    console.log("expected:");
+    console.log(JSON.stringify(expected));
+    console.log("actual:");
+    console.log(JSON.stringify(result));
+    process.exit(1);
   }
 
   const typesEntryFilePath = packageJson.types;
