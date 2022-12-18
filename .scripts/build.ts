@@ -8,8 +8,11 @@ import {
   isFile,
   readFile,
   writeFile,
+  moveFile,
   listFilesWithinFolder,
   copyFile,
+  splitPath,
+  deleteFile,
 } from "easier-node";
 import { join, dirname } from "node:path/posix";
 import { build } from "xnr";
@@ -67,8 +70,26 @@ const main = async () => {
     await deleteFolder(".build.lib");
 
     for (const filePath of await listFilesWithinFolder("dist/cjs")) {
-      if (filePath.endsWith(".d.ts") || filePath.endsWith(".map")) {
+      if (filePath.endsWith(".d.ts")) {
         await copyFile(`dist/cjs/${filePath}`, `dist/esm/${filePath}`);
+      }
+      if (filePath.endsWith(".js.map")) {
+        const fileName = splitPath(filePath).at(-1) as string;
+        const fileNameWithoutExt = fileName.slice(0, -7);
+        const sourceMap = JSON.parse(await readFile(`dist/cjs/${filePath}`));
+        await writeFile(
+          `dist/cjs/${fileNameWithoutExt}.cjs.map`,
+          JSON.stringify({
+            ...sourceMap,
+            file: `${fileNameWithoutExt}.cjs`,
+          })
+        );
+        await deleteFile(`dist/cjs/${filePath}`);
+      }
+      if (filePath.endsWith(".js")) {
+        const fileName = splitPath(filePath).at(-1) as string;
+        const fileNameWithoutExt = fileName.slice(0, -3);
+        await moveFile(`dist/cjs/${filePath}`, `dist/cjs/${fileNameWithoutExt}.cjs`);
       }
     }
   }
@@ -84,7 +105,6 @@ const tsc = async (tsConfig: TSConfig) => {
   tsConfig.include = ["lib/**/*"];
   tsConfig.exclude = ["**/*.test.ts"];
 
-  // console.log(JSON.stringify(tsConfig, null, 2));
   await writeFile("tsconfig.tmp.json", JSON.stringify(tsConfig));
 
   return new Promise<void>((resolve, reject) => {
