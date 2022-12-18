@@ -1,19 +1,7 @@
 import { execSync, exec } from "node:child_process";
-import { delay, dnsLookup, isFile, readFile, readInput, removeAny, writeFile } from "easier-node";
+import { delay, dnsLookup, isFile, readFile, readInput, deleteAny, writeFile } from "easier-node";
 import { firstIsBefore, parseVersion } from "./lib/version";
 import { getPackageRoot, getPackageJson } from "./lib/package";
-
-/*
-- [x] check up to date with git
-- [x] perform custom validate checks
-- [x] calculate next version
-- [x] final manual sanity checks
-- [ ] build
-- [ ] validate build
-  - [ ] tests
-- [ ] publish step
-  - reverse engineer np
-*/
 
 // preconditions
 {
@@ -218,23 +206,28 @@ if (answer.trim().toLowerCase() !== "y") {
   process.exit(1);
 }
 
-// actually run the deploy
-await writeFile(
-  "package.json",
-  JSON.stringify(
-    {
-      ...packageJson,
-      version: nextVersion,
-    },
-    null,
-    2
-  )
-);
-await removeAny("node_modules");
-execSync("npm install --engine-strict --ignore-scripts", { stdio: "inherit" });
-execSync("npm run build", { stdio: "inherit" });
-execSync("npm run check-build", { stdio: "inherit" });
-execSync("npm run coverage", { stdio: "inherit" });
+// final checks
+try {
+  await writeFile(
+    "package.json",
+    JSON.stringify(
+      {
+        ...packageJson,
+        version: nextVersion,
+      },
+      null,
+      2
+    )
+  );
+  await deleteAny("node_modules");
+  execSync("npm install --engine-strict --ignore-scripts", { stdio: "inherit" });
+  execSync("npm run build", { stdio: "inherit" });
+  execSync("npm run check-build", { stdio: "inherit" });
+  execSync("npm run coverage", { stdio: "inherit" });
+} catch (error) {
+  execSync("git checkout .", { stdio: "inherit" });
+  throw error;
+}
 
 console.log("final release checks passed... releasing...");
 
@@ -243,16 +236,16 @@ console.log("final release checks passed... releasing...");
 - [x] remove node_modules
 - [x] npm install --engine-strict
 - [x] npm run build
-  - [ ] update build to attach licence attribution comment
 - [x] npm run check-build
     - [x] cli simulate a npm package locally, run with npx and check if results are right
-    - [ ] api
+    - [x] api
       - [x] esm check
-      - [ ] cjs check
-      - [ ] types check
+      - [x] cjs check
+      - [x] types check
 - [x] npm run coverage
 - at this point, there's no place for the release to fail
 - perform the final modifications (and ignore Ctrl-C / other kills)
+  - attach licence attribution comments
   - git add .
   - git commit -m 'release'
   - git tag

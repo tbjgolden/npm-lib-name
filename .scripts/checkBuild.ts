@@ -88,4 +88,10 @@ if (await isFile("lib/index.ts")) {
       process.exit(1);
     }
   }
+
+  const typesEntryFilePath = packageJson.types;
+  if (typeof typesEntryFilePath !== "string" || !(await isFile(typesEntryFilePath))) {
+    console.log(`"types": "${typesEntryFilePath}" must refer to a file`);
+    process.exit(1);
+  }
 }

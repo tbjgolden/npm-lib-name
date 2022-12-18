@@ -5,6 +5,7 @@
   "main": "dist/cjs/index.js",
   "module": "dist/esm/index.mjs",
   "types": "dist/esm/index.d.ts",
+  "author": "Tom Golden <oss@tom.bio> (https://tom.bio)",
   "bin": {
     "npm-lib-name": "./dist/cli/index.mjs"
   },
