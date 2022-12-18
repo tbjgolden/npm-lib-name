@@ -200,8 +200,8 @@ let nextVersion: string;
 console.log(`Final checklist:`);
 console.log(`
 - do you need to update the readme?
-- would anything be better as a peer dep?
-- are the examples in the readme examples for cli/api also unit tests?
+- would anything be better as a peer dependency?
+- are the examples in the readme examples for cli/api also tests?
 `);
 for (let i = 5; i >= 1; i--) {
   process.stdout.write(i + "…");
@@ -237,7 +237,7 @@ process.on("SIGTERM", disableProcessExit); // `kill` command
   - attach licence attribution comments
     - after hashbang
   - git add .
-  - git commit -m 'release'
+  - git commit -m 'ci: release v1.1.1'
   - git tag
   - git push commit
   - git push tag
