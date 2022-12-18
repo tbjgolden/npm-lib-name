@@ -6,6 +6,7 @@
   "module": "dist/esm/index.mjs",
   "types": "dist/esm/index.d.ts",
   "author": "Tom Golden <oss@tom.bio> (https://tom.bio)",
+  "type": "module",
   "bin": {
     "npm-lib-name": "./dist/cli/index.mjs"
   },
@@ -38,7 +39,7 @@
     "prettier": "^2.5.1",
     "simple-git-hooks": "^2.8.1",
     "typescript": "^4.6.4",
-    "xnr": "^1.0.0"
+    "xnr": "^1.0.1"
   },
   "files": [
     "dist"
