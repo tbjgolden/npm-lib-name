@@ -43,6 +43,8 @@ const main = async () => {
   }
 
   if (SHOULD_BUILD_LIB) {
+    const REQUIRE_REGEX = /\brequire\((["'`])([./].*)\1\)/g;
+
     await tsc({
       ...tsConfig,
       compilerOptions: {
@@ -128,8 +130,6 @@ const tsc = async (tsConfig: TSConfig) => {
     });
   });
 };
-
-const REQUIRE_REGEX = /\brequire\((["'`])([./].*)\1\)/g;
 
 main().catch((error) => {
   throw error;
