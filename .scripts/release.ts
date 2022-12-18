@@ -166,7 +166,7 @@ let nextVersion: string;
     }
   }
 
-  const featRegex = /^feat(\([^)]+\))?:/;
+  const FEAT_REGEX = /^feat(\([^)]+\))?!?:/;
   const thisVersionCommits = commits.slice(0, indexOfPrevVersion);
 
   if (thisVersionCommits.length === 0) {
@@ -183,7 +183,7 @@ let nextVersion: string;
     nextVersion = `${currVersion.major}.1.0`;
   } else if (thisVersionCommits.some(({ footer }) => footer.includes("BREAKING CHANGE: "))) {
     nextVersion = `${currVersion.major + 1}.0.0`;
-  } else if (thisVersionCommits.some(({ message }) => featRegex.test(message))) {
+  } else if (thisVersionCommits.some(({ message }) => FEAT_REGEX.test(message))) {
     nextVersion = `${currVersion.major}.${currVersion.minor + 1}.0`;
   } else {
     nextVersion = `${currVersion.major}.${currVersion.minor}.${currVersion.patch + 1}`;
@@ -207,44 +207,27 @@ if (answer.trim().toLowerCase() !== "y") {
 }
 
 // final checks
-try {
-  await writeFile(
-    "package.json",
-    JSON.stringify(
-      {
-        ...packageJson,
-        version: nextVersion,
-      },
-      null,
-      2
-    )
-  );
-  await deleteAny("node_modules");
-  execSync("npm install --engine-strict --ignore-scripts", { stdio: "inherit" });
-  execSync("npm run build", { stdio: "inherit" });
-  execSync("npm run check-build", { stdio: "inherit" });
-  execSync("npm run coverage", { stdio: "inherit" });
-} catch (error) {
-  execSync("git checkout .", { stdio: "inherit" });
-  throw error;
-}
+await writeFile("package.json", JSON.stringify({ ...packageJson, version: nextVersion }));
+execSync("npx prettier --write package.json");
+
+await deleteAny("node_modules");
+execSync("npm install --engine-strict --ignore-scripts", { stdio: "inherit" });
+execSync("npm run build", { stdio: "inherit" });
+execSync("npm run check-build", { stdio: "inherit" });
+execSync("npm run coverage", { stdio: "inherit" });
 
 console.log("final release checks passed... releasing...");
 
+// the release
+const disableProcessExit = () => {
+  // noop
+};
+process.on("SIGINT", disableProcessExit); // CTRL+C
+process.on("SIGQUIT", disableProcessExit); // Keyboard quit
+process.on("SIGTERM", disableProcessExit); // `kill` command
+
 /*
-- [x] update package.json version
-- [x] remove node_modules
-- [x] npm install --engine-strict
-- [x] npm run build
-- [x] npm run check-build
-    - [x] cli simulate a npm package locally, run with npx and check if results are right
-    - [x] api
-      - [x] esm check
-      - [x] cjs check
-      - [x] types check
-- [x] npm run coverage
-- at this point, there's no place for the release to fail
-- perform the final modifications (and ignore Ctrl-C / other kills)
+- perform the final modifications
   - attach licence attribution comments
   - git add .
   - git commit -m 'release'
