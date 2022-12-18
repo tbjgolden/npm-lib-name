@@ -167,6 +167,7 @@ let nextVersion: string;
   }
 
   const FEAT_REGEX = /^feat(\([^)]+\))?!?:/;
+  const BREAKING_CHANGE_REGEX = /^[a-z]+(\([^)]+\))?!:/;
   const thisVersionCommits = commits.slice(0, indexOfPrevVersion);
 
   if (thisVersionCommits.length === 0) {
@@ -181,7 +182,12 @@ let nextVersion: string;
     nextVersion = `${currVersion.major}.0.0`;
   } else if (firstIsBefore(currVersion, { major: 0, minor: 1, patch: 0 })) {
     nextVersion = `${currVersion.major}.1.0`;
-  } else if (thisVersionCommits.some(({ footer }) => footer.includes("BREAKING CHANGE: "))) {
+  } else if (
+    thisVersionCommits.some(
+      ({ message, footer }) =>
+        BREAKING_CHANGE_REGEX.test(message) || footer.includes("BREAKING CHANGE: ")
+    )
+  ) {
     nextVersion = `${currVersion.major + 1}.0.0`;
   } else if (thisVersionCommits.some(({ message }) => FEAT_REGEX.test(message))) {
     nextVersion = `${currVersion.major}.${currVersion.minor + 1}.0`;
@@ -229,6 +235,7 @@ process.on("SIGTERM", disableProcessExit); // `kill` command
 /*
 - perform the final modifications
   - attach licence attribution comments
+    - after hashbang
   - git add .
   - git commit -m 'release'
   - git tag
