@@ -304,7 +304,7 @@ console.log("final release checks passed... releasing...");
   execSync(`git tag -a v${nextVersion} -m '${nextVersion}'`, { stdio: "inherit" });
   execSync(`git push`, { stdio: "inherit" });
   execSync(`git push origin v${nextVersion}`, { stdio: "inherit" });
-  execSync(`npm publish --dry-run`, { stdio: "inherit" });
+  execSync(`npm publish`, { stdio: "inherit" });
 
   if (homepage && homepage.startsWith("https://github.com/")) {
     const majorMessages = majors
