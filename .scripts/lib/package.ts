@@ -43,6 +43,8 @@ export type PackageJson = Partial<{
   files: string[];
   workspaces: string[];
   bundleDependencies: string[];
+  os: string[];
+  cpu: string[];
   bin: Record<string, string | undefined>;
   directories: Record<string, string | undefined>;
   scripts: Record<string, string | undefined>;
@@ -53,8 +55,6 @@ export type PackageJson = Partial<{
   optionalDependencies: Record<string, string | undefined>;
   overrides: Record<string, string | undefined>;
   engines: Record<string, string | undefined>;
-  os: Record<string, string | undefined>;
-  cpu: Record<string, string | undefined>;
   peerDependenciesMeta: Record<string, Record<string, string | undefined> | undefined>;
   bugs: { url?: string; email?: string };
   author: string | { name?: string; url?: string; email?: string };
@@ -128,7 +128,7 @@ export const getPackageJson = async (): Promise<PackageJson> => {
     ]) {
       expectToBeAString(obj[key]);
     }
-    for (key of ["keywords", "files", "workspaces", "bundleDependencies"]) {
+    for (key of ["keywords", "files", "workspaces", "bundleDependencies", "os", "cpu"]) {
       expectToBeAStringArray(obj[key]);
     }
     for (key of [
@@ -142,8 +142,6 @@ export const getPackageJson = async (): Promise<PackageJson> => {
       "optionalDependencies",
       "overrides",
       "engines",
-      "os",
-      "cpu",
       "bugs",
     ]) {
       expectToBeAStringMap(obj[key]);
