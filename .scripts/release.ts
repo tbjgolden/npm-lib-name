@@ -34,81 +34,86 @@ import { getPackageRoot, getPackageJson } from "./lib/package";
 const errors: string[] = [];
 const warnings: string[] = [];
 
-const packageJson = await getPackageJson();
+{
+  const packageJson = await getPackageJson();
 
-// validation errors
-if (!packageJson.engines?.node) {
-  errors.push(`package.json should specify the node version it is compatible with`);
-}
-if (packageJson.files === undefined) {
-  errors.push(`package.json should include a files array`);
-}
-if (
-  packageJson?.scripts?.test === undefined ||
-  packageJson.scripts.test.includes("no test specified")
-) {
-  errors.push(`package.json should include a test script`);
-}
-if (packageJson.keywords === undefined || packageJson.keywords.length < 7) {
-  errors.push(`package.json should have at least 7 keywords`);
-}
-if ((packageJson.description?.length ?? 0) < 10) {
-  errors.push(`package.json should have a short description`);
-}
-if (packageJson.license === undefined) {
-  errors.push(`package.json needs a licence`);
-}
-if (!(await isFile("README.md")) || (await readFile("README.md")).length < 800) {
-  errors.push(`project should contain a README.md (with 800+ chars)`);
-}
-const npmVulnerabilites = await new Promise<string>((resolve) => {
-  exec("npm audit", (err, stdout) => {
-    resolve(err ? stdout.trim() : "");
+  // validation errors
+  if (!packageJson.engines?.node) {
+    errors.push(`package.json should specify the node version it is compatible with`);
+  }
+  if (packageJson.files === undefined) {
+    errors.push(`package.json should include a files array`);
+  }
+  if (packageJson.name === undefined) {
+    errors.push(`package.json should have a name`);
+  }
+  if (
+    packageJson?.scripts?.test === undefined ||
+    packageJson.scripts.test.includes("no test specified")
+  ) {
+    errors.push(`package.json should include a test script`);
+  }
+  if (packageJson.keywords === undefined || packageJson.keywords.length < 7) {
+    errors.push(`package.json should have at least 7 keywords`);
+  }
+  if ((packageJson.description?.length ?? 0) < 10) {
+    errors.push(`package.json should have a short description`);
+  }
+  if (packageJson.license === undefined) {
+    errors.push(`package.json needs a licence`);
+  }
+  if (!(await isFile("README.md")) || (await readFile("README.md")).length < 800) {
+    errors.push(`project should contain a README.md (with 800+ chars)`);
+  }
+  const npmVulnerabilites = await new Promise<string>((resolve) => {
+    exec("npm audit", (err, stdout) => {
+      resolve(err ? stdout.trim() : "");
+    });
   });
-});
-if (npmVulnerabilites) {
-  errors.push(
-    `npm dependencies contain vulnerabilities:\n${npmVulnerabilites
-      .split("\n")
-      .map((line) => `  │ ${line}`)
-      .join("\n")}`
-  );
-}
+  if (npmVulnerabilites) {
+    errors.push(
+      `npm dependencies contain vulnerabilities:\n${npmVulnerabilites
+        .split("\n")
+        .map((line) => `  │ ${line}`)
+        .join("\n")}`
+    );
+  }
 
-// validation warnings
-if (Object.keys(packageJson.devDependencies ?? {}).length === 0) {
-  warnings.push(`package.json should probably have dev dependencies`);
-}
-if (
-  !(
-    Object.keys(packageJson.dependencies ?? {}).length > 0 ||
-    Object.keys(packageJson.peerDependencies ?? {}).length > 0 ||
-    Object.keys(packageJson.optionalDependencies ?? {}).length > 0
-  )
-) {
-  warnings.push(`package.json should probably have dependencies`);
-}
+  // validation warnings
+  if (Object.keys(packageJson.devDependencies ?? {}).length === 0) {
+    warnings.push(`package.json should probably have dev dependencies`);
+  }
+  if (
+    !(
+      Object.keys(packageJson.dependencies ?? {}).length > 0 ||
+      Object.keys(packageJson.peerDependencies ?? {}).length > 0 ||
+      Object.keys(packageJson.optionalDependencies ?? {}).length > 0
+    )
+  ) {
+    warnings.push(`package.json should probably have dependencies`);
+  }
 
-// - standardised readme format / that can be checked? e.g. has example usage, fixed titles
+  // - standardised readme format / that can be checked? e.g. has example usage, fixed titles
 
-if (errors.length > 0) {
-  console.log(`ERRORS:\n${errors.map((message) => `- ${message}`).join("\n")}`);
-  console.log();
-}
-if (warnings.length > 0) {
-  console.log(`WARNINGS:\n${warnings.map((message) => `- ${message}`).join("\n")}`);
-  console.log();
-}
-if (errors.length > 0) {
-  process.exit(1);
-}
-
-if (warnings.length > 0) {
-  const answer = await readInput("Some warnings - continue anyway? [N/y]");
-  if (answer.trim().toLowerCase() !== "y") {
+  if (errors.length > 0) {
+    console.log(`ERRORS:\n${errors.map((message) => `- ${message}`).join("\n")}`);
+    console.log();
+  }
+  if (warnings.length > 0) {
+    console.log(`WARNINGS:\n${warnings.map((message) => `- ${message}`).join("\n")}`);
+    console.log();
+  }
+  if (errors.length > 0) {
     process.exit(1);
   }
-  console.log();
+
+  if (warnings.length > 0) {
+    const answer = await readInput("Some warnings - continue anyway? [N/y]");
+    if (answer.trim().toLowerCase() !== "y") {
+      process.exit(1);
+    }
+    console.log();
+  }
 }
 
 // calculating next version using semantic release principles
@@ -213,7 +218,10 @@ if (answer.trim().toLowerCase() !== "y") {
 }
 
 // final checks
-await writeFile("package.json", JSON.stringify({ ...packageJson, version: nextVersion }));
+await writeFile(
+  "package.json",
+  JSON.stringify({ ...(await getPackageJson()), version: nextVersion })
+);
 execSync("npx prettier --write package.json");
 
 await deleteAny("node_modules");
@@ -224,24 +232,57 @@ execSync("npm run coverage", { stdio: "inherit" });
 
 console.log("final release checks passed... releasing...");
 
+// prevent kill during this step
+{
+  const disableProcessExit = () => {
+    // noop
+  };
+  process.on("SIGINT", disableProcessExit); // CTRL+C
+  process.on("SIGQUIT", disableProcessExit); // Keyboard quit
+  process.on("SIGTERM", disableProcessExit); // `kill` command
+}
+
 // the release
-const disableProcessExit = () => {
-  // noop
-};
-process.on("SIGINT", disableProcessExit); // CTRL+C
-process.on("SIGQUIT", disableProcessExit); // Keyboard quit
-process.on("SIGTERM", disableProcessExit); // `kill` command
+{
+  const { name, license, main, module, types, author } = await getPackageJson();
+  for (const distFile of [main, module, types]) {
+    if (distFile) {
+      const distFileContents = await readFile(distFile);
+      let eol1Index = distFileContents.indexOf("\n");
+      if (eol1Index === -1) eol1Index = Number.POSITIVE_INFINITY;
+      const line1 = distFileContents.slice(0, eol1Index);
 
-/*
-- perform the final modifications
-  - attach licence attribution comments
-    - after hashbang
-  - git add .
-  - git commit -m 'ci: release v1.1.1'
-  - git tag
-  - git push commit
-  - git push tag
-  - npm publish
-*/
+      let authorStr = "";
+      if (typeof author === "string") {
+        authorStr = author;
+      } else if (author) {
+        authorStr = `${author.name}${author.email ? ` <${author.email}>` : ""}${
+          author.url ? ` (${author.url})` : ""
+        }`;
+      }
 
-// run npm release
+      const licenceStr = license ? `@license ${license} ` : "";
+
+      const comment = `/**! ${[name, authorStr, licenceStr].join(" | ")} */`;
+
+      await writeFile(
+        distFile,
+        line1.startsWith("#!")
+          ? line1 + "\n" + comment + "\n" + distFileContents.slice(eol1Index + 1)
+          : comment + "\n" + distFileContents
+      );
+    }
+  }
+
+  /*
+  - perform the final modifications
+    - git add .
+    - git commit -m 'ci: release v1.1.1'
+    - git tag
+    - git push commit
+    - git push tag
+    - npm publish
+  */
+
+  // run npm release
+}

@@ -36,6 +36,8 @@ export type PackageJson = Partial<{
   homepage: string;
   license: string;
   main: string;
+  module: string;
+  types: string;
   browser: string;
   keywords: string[];
   files: string[];
@@ -113,7 +115,17 @@ export const getPackageJson = async (): Promise<PackageJson> => {
   const obj = (JSON.parse(json) ?? {}) as JSONObject;
   let key = "";
   try {
-    for (key of ["name", "version", "description", "homepage", "license", "main", "browser"]) {
+    for (key of [
+      "name",
+      "version",
+      "description",
+      "homepage",
+      "license",
+      "main",
+      "module",
+      "types",
+      "browser",
+    ]) {
       expectToBeAString(obj[key]);
     }
     for (key of ["keywords", "files", "workspaces", "bundleDependencies"]) {
