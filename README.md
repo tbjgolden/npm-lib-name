@@ -14,7 +14,7 @@ npx xnr .scripts/name.ts
 
 ![npm](https://img.shields.io/npm/v/npm-lib-name)
 ![install size](https://img.shields.io/bundlephobia/min/npm-lib-name)
-![coverage](https://img.shields.io/badge/dynamic/json?url=https%3A%2F%2Fraw.githubusercontent.com%2Ftbjgolden%2Fnpm-lib-name%2Fmain%2Fcoverage%2Fcoverage-summary.json&label=coverage&query=$.total.lines.pct&color=brightgreen&suffix=%25)
+![coverage](https://img.shields.io/badge/dynamic/json?url=https%3A%2F%2Fraw.githubusercontent.com%2Ftbjgolden%2Fnpm-lib-name%2Fmain%2Fcoverage.json&label=coverage&query=$.total.lines.pct&color=brightgreen&suffix=%25)
 ![npm type definitions](https://img.shields.io/npm/types/xnr)
 ![license](https://img.shields.io/npm/l/xnr)
 
