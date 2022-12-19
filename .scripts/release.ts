@@ -118,6 +118,7 @@ const warnings: string[] = [];
 
 // calculating next version using semantic release principles
 let nextVersion: string;
+let changelogCommits: Commit[];
 {
   let currVersionStr: string;
   try {
@@ -173,9 +174,9 @@ let nextVersion: string;
 
   const FEAT_REGEX = /^feat(\([^)]+\))?!?:/;
   const BREAKING_CHANGE_REGEX = /^[a-z]+(\([^)]+\))?!:/;
-  const thisVersionCommits = commits.slice(0, indexOfPrevVersion);
+  changelogCommits = commits.slice(0, indexOfPrevVersion);
 
-  if (thisVersionCommits.length === 0) {
+  if (changelogCommits.length === 0) {
     console.log("no new commits since newest version");
     process.exit(1);
   }
@@ -188,13 +189,13 @@ let nextVersion: string;
   } else if (firstIsBefore(currVersion, { major: 0, minor: 1, patch: 0 })) {
     nextVersion = `${currVersion.major}.1.0`;
   } else if (
-    thisVersionCommits.some(
+    changelogCommits.some(
       ({ message, footer }) =>
         BREAKING_CHANGE_REGEX.test(message) || footer.includes("BREAKING CHANGE: ")
     )
   ) {
     nextVersion = `${currVersion.major + 1}.0.0`;
-  } else if (thisVersionCommits.some(({ message }) => FEAT_REGEX.test(message))) {
+  } else if (changelogCommits.some(({ message }) => FEAT_REGEX.test(message))) {
     nextVersion = `${currVersion.major}.${currVersion.minor + 1}.0`;
   } else {
     nextVersion = `${currVersion.major}.${currVersion.minor}.${currVersion.patch + 1}`;
@@ -283,6 +284,13 @@ console.log("final release checks passed... releasing...");
     - git push tag
     - npm publish
   */
+
+  execSync("git add .");
+  execSync(`git commit -m 'ci: release v${nextVersion}'`);
+  execSync(`git tag -a v${nextVersion} -m '${nextVersion}'`);
+  execSync(`git push`);
+  execSync(`git push origin v${nextVersion}`);
+  execSync(`npm publish v${nextVersion} --dry-run`, { stdio: "inherit" });
 
   // run npm release
 }
