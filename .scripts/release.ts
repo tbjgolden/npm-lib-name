@@ -14,26 +14,25 @@ import { getPackageRoot, getPackageJson } from "./lib/package";
   const isPointingAtRemoteMain = statusStdout.includes("\n# branch.upstream origin/main");
   if (!isPointingAtRemoteMain) {
     console.log("can only release from main (with origin/main as upstream)");
-    // process.exit(1);
+    process.exit(1);
   }
   const hasPendingFiles = statusStdout
     .split("\n")
     .some((line) => Boolean(line) && !line.startsWith("# "));
   if (hasPendingFiles) {
     console.log("local has uncommitted files");
-    // process.exit(1);
+    process.exit(1);
   }
   const isUpToDateWithRemote = statusStdout.includes("\n# branch.ab +0 -0");
   if (!isUpToDateWithRemote) {
     console.log("local is not level with remote");
-    // process.exit(1);
+    process.exit(1);
   }
 }
 
 // custom validation
 const errors: string[] = [];
 const warnings: string[] = [];
-
 {
   const packageJson = await getPackageJson();
 
@@ -117,6 +116,7 @@ const warnings: string[] = [];
 }
 
 // calculating next version using semantic release principles
+type Commit = { hash: string; message: string; footer: string };
 let nextVersion: string;
 let changelogCommits: Commit[];
 {
@@ -135,8 +135,6 @@ let changelogCommits: Commit[];
     }
   }
   const currVersion = parseVersion(currVersionStr);
-
-  type Commit = { hash: string; message: string; footer: string };
 
   // get all commits with hashes, messages and footers
   const rawGitLogStr = execSync(`git --no-pager log --format=format:'%H$%n%B'`).toString();
@@ -275,22 +273,10 @@ console.log("final release checks passed... releasing...");
     }
   }
 
-  /*
-  - perform the final modifications
-    - git add .
-    - git commit -m 'ci: release v1.1.1'
-    - git tag
-    - git push commit
-    - git push tag
-    - npm publish
-  */
-
-  execSync("git add .");
-  execSync(`git commit -m 'ci: release v${nextVersion}'`);
-  execSync(`git tag -a v${nextVersion} -m '${nextVersion}'`);
-  execSync(`git push`);
-  execSync(`git push origin v${nextVersion}`);
-  execSync(`npm publish v${nextVersion} --dry-run`, { stdio: "inherit" });
-
-  // run npm release
+  execSync("git add .", { stdio: "inherit" });
+  execSync(`git commit -m 'ci: release v${nextVersion}'`, { stdio: "inherit" });
+  execSync(`git tag -a v${nextVersion} -m '${nextVersion}'`, { stdio: "inherit" });
+  execSync(`git push`, { stdio: "inherit" });
+  execSync(`git push origin v${nextVersion}`, { stdio: "inherit" });
+  execSync(`npm publish --dry-run`, { stdio: "inherit" });
 }
