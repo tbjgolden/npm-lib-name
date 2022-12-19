@@ -119,6 +119,9 @@ const warnings: string[] = [];
 type Commit = { hash: string; message: string; footer: string };
 let nextVersion: string;
 let changelogCommits: Commit[];
+const majors: Commit[] = [];
+const minors: Commit[] = [];
+const patchs: Commit[] = [];
 {
   let currVersionStr: string;
   try {
@@ -172,11 +175,25 @@ let changelogCommits: Commit[];
 
   const FEAT_REGEX = /^feat(\([^)]+\))?!?:/;
   const BREAKING_CHANGE_REGEX = /^[a-z]+(\([^)]+\))?!:/;
+  const CONVENTIONAL_COMMIT_REGEX = /^[a-z]+(\([^)]+\))?!?:/;
   changelogCommits = commits.slice(0, indexOfPrevVersion);
 
   if (changelogCommits.length === 0) {
     console.log("no new commits since newest version");
     // process.exit(1);
+  }
+
+  for (const commit of changelogCommits) {
+    const { message, footer } = commit;
+    if (CONVENTIONAL_COMMIT_REGEX.test(message)) {
+      if (BREAKING_CHANGE_REGEX.test(message) || footer.includes("BREAKING CHANGE: ")) {
+        majors.push(commit);
+      } else if (FEAT_REGEX.test(message)) {
+        minors.push(commit);
+      } else {
+        patchs.push(commit);
+      }
+    }
   }
 
   if (
@@ -186,17 +203,14 @@ let changelogCommits: Commit[];
     nextVersion = `${currVersion.major}.0.0`;
   } else if (firstIsBefore(currVersion, { major: 0, minor: 1, patch: 0 })) {
     nextVersion = `${currVersion.major}.1.0`;
-  } else if (
-    changelogCommits.some(
-      ({ message, footer }) =>
-        BREAKING_CHANGE_REGEX.test(message) || footer.includes("BREAKING CHANGE: ")
-    )
-  ) {
-    nextVersion = `${currVersion.major + 1}.0.0`;
-  } else if (changelogCommits.some(({ message }) => FEAT_REGEX.test(message))) {
-    nextVersion = `${currVersion.major}.${currVersion.minor + 1}.0`;
   } else {
-    nextVersion = `${currVersion.major}.${currVersion.minor}.${currVersion.patch + 1}`;
+    if (majors.length > 0) {
+      nextVersion = `${currVersion.major + 1}.0.0`;
+    } else if (minors.length > 0) {
+      nextVersion = `${currVersion.major}.${currVersion.minor + 1}.0`;
+    } else {
+      nextVersion = `${currVersion.major}.${currVersion.minor}.${currVersion.patch + 1}`;
+    }
   }
 }
 
@@ -213,6 +227,9 @@ for (let i = 5; i >= 1; i--) {
 }
 const answer = await readInput(`release ${nextVersion}? [N/y]`);
 if (answer.trim().toLowerCase() !== "y") {
+  console.log(majors);
+  console.log(minors);
+  console.log(patchs);
   process.exit(1);
 }
 
@@ -279,4 +296,45 @@ console.log("final release checks passed... releasing...");
   execSync(`git push`, { stdio: "inherit" });
   execSync(`git push origin v${nextVersion}`, { stdio: "inherit" });
   execSync(`npm publish --dry-run`, { stdio: "inherit" });
+
+  const gitRemote = execSync("git remote get-url origin").toString().trim();
+  let projectPath = "";
+  if (gitRemote.startsWith("https://github.com/")) {
+    projectPath = gitRemote.slice(19, gitRemote.endsWith(".git") ? -4 : Number.POSITIVE_INFINITY);
+  } else if (gitRemote.startsWith("git@github.com:")) {
+    projectPath = gitRemote.slice(15, gitRemote.endsWith(".git") ? -4 : Number.POSITIVE_INFINITY);
+  }
+
+  if (projectPath) {
+    const majorMessages = majors
+      .map(({ message }) => `- ${message}`)
+      .filter((commit, index, arr) => {
+        return index === 0 || arr[index - 1] !== commit;
+      });
+    const minorMessages = minors
+      .map(({ message }) => `- ${message}`)
+      .filter((commit, index, arr) => {
+        return index === 0 || arr[index - 1] !== commit;
+      });
+    const patchMessages = patchs
+      .map(({ message }) => `- ${message}`)
+      .filter((commit, index, arr) => {
+        return index === 0 || arr[index - 1] !== commit;
+      });
+
+    const encodedBody = encodeURIComponent(
+      [
+        majorMessages.length > 0 ? `# Major changes (breaking)\n\n${majorMessages.join("\n")}` : "",
+        minorMessages.length > 0 ? `# Feature updates\n\n${minorMessages.join("\n")}` : "",
+        patchMessages.length > 0 ? `# Other commits\n\n${patchMessages.join("\n")}` : "",
+      ]
+        .filter(Boolean)
+        .join("\n\n")
+    );
+
+    console.log("Create GitHub release:");
+    console.log(
+      `https://github.com/${projectPath}/releases/new?tag=v${nextVersion}&title=v${nextVersion}&body=${encodedBody}`
+    );
+  }
 }
