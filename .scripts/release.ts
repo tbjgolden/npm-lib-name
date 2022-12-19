@@ -7,26 +7,26 @@ import { getPackageRoot, getPackageJson } from "./lib/package";
 {
   if (process.cwd() !== (await getPackageRoot())) {
     console.log("must be run from package root");
-    process.exit(1);
+    // process.exit(1);
   }
   execSync("git fetch --all --prune");
   const statusStdout = execSync("git --no-optional-locks status --porcelain=2 --branch").toString();
   const isPointingAtRemoteMain = statusStdout.includes("\n# branch.upstream origin/main");
   if (!isPointingAtRemoteMain) {
     console.log("can only release from main (with origin/main as upstream)");
-    process.exit(1);
+    // process.exit(1);
   }
   const hasPendingFiles = statusStdout
     .split("\n")
     .some((line) => Boolean(line) && !line.startsWith("# "));
   if (hasPendingFiles) {
     console.log("local has uncommitted files");
-    process.exit(1);
+    // process.exit(1);
   }
   const isUpToDateWithRemote = statusStdout.includes("\n# branch.ab +0 -0");
   if (!isUpToDateWithRemote) {
     console.log("local is not level with remote");
-    process.exit(1);
+    // process.exit(1);
   }
 }
 
@@ -103,7 +103,7 @@ const warnings: string[] = [];
     console.log();
   }
   if (errors.length > 0) {
-    process.exit(1);
+    // process.exit(1);
   }
 
   if (warnings.length > 0) {
@@ -176,7 +176,7 @@ let changelogCommits: Commit[];
 
   if (changelogCommits.length === 0) {
     console.log("no new commits since newest version");
-    process.exit(1);
+    // process.exit(1);
   }
 
   if (
