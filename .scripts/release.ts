@@ -248,6 +248,12 @@ execSync("npm install --engine-strict --ignore-scripts", { stdio: "inherit" });
 execSync("npm run build", { stdio: "inherit" });
 execSync("npm run check-build", { stdio: "inherit" });
 execSync("npm run coverage", { stdio: "inherit" });
+await writeFile(
+  "coverage.json",
+  JSON.stringify({
+    total: JSON.parse(await readFile("coverage/coverage-summary.json")).total,
+  })
+);
 
 console.log("final release checks passed... releasing...");
 

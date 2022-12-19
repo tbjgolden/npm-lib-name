@@ -61,7 +61,7 @@ const main = async () => {
     // should only run on first name
     if (currentName === `npm${"-"}lib${"-"}name`) {
       await deleteFolder(path.join(projectRoot, ".git"));
-      execSync("git init && git add . && git commit -m 'Initial commit from just-build'", {
+      execSync("git init && git add . && git commit -m 'Initial commit from npm-lib-name'", {
         cwd: projectRoot,
       });
       console.log("New git repo created");

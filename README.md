@@ -1,5 +1,5 @@
 ```sh
-git clone https://github.com/tbjgolden/just-build.git cool-package-name
+git clone https://github.com/tbjgolden/npm-lib-name.git cool-package-name
 cd cool-package-name
 npm install
 # One time init function to convert template to new project

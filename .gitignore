@@ -9,6 +9,5 @@ node_modules
 dist
 .xnr
 /.build.*
-/coverage/*
-!/coverage/coverage-summary.json
+/coverage
 !.scripts
