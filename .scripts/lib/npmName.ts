@@ -1,9 +1,11 @@
-import { builtins } from "./builtins";
+import { builtinModules } from "node:module";
+
+export const builtins = new Set(builtinModules);
 
 const SPECIAL_CHAR_REGEX = /[!'()*~]/;
 
 export const validate = function (name: string) {
-  const errors = [];
+  const errors: string[] = [];
 
   if (name.length === 0) {
     errors.push("name length must be greater than zero");

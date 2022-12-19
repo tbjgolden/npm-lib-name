@@ -1,11 +1,10 @@
-/* eslint-disable no-console */
 import fs from "node:fs";
 import path from "node:path";
 import { execSync } from "node:child_process";
-import { prompt } from "enquirer";
-import { validate } from "./deps/npmName";
-import { rimraf } from "./deps/rimraf";
-import { getPackageRoot } from "./deps/package";
+import { validate } from "./lib/npmName";
+import { getPackageRoot } from "./lib/package";
+import { deleteFolder, readInput } from "easier-node";
+import { checkDirectory } from "./lib/checkDirectory";
 
 const escapeRegExp = (str: string): string => {
   return str.replace(/[$()*+.?[\\\]^{|}]/g, "\\$&"); // $& means the whole matched string
@@ -14,12 +13,12 @@ const escapeRegExp = (str: string): string => {
 const currentName = "npm-lib-name";
 
 const main = async () => {
+  await checkDirectory();
+
   const projectRoot = await getPackageRoot();
 
   const directoryName = projectRoot.slice(path.dirname(projectRoot).length + 1);
-  let initial: string | undefined = validate(directoryName).valid
-    ? directoryName
-    : undefined;
+  const initial: string | undefined = validate(directoryName).valid ? directoryName : undefined;
   let result: string | undefined;
   let validateResult: ReturnType<typeof validate> | undefined;
 
@@ -30,13 +29,12 @@ const main = async () => {
       }
     }
 
-    const { value } = await prompt<{ value: string }>({
-      type: "input",
-      name: "value",
-      message: "npm package name?",
-      initial,
-    });
-    initial = undefined;
+    const input = await readInput(`npm package name? [${initial}]`);
+    let value = input.trim();
+    if (value === "" && initial) {
+      value = initial;
+    }
+
     result = value.trim();
     validateResult = validate(result);
   } while (!validateResult.valid || result.includes("/"));
@@ -62,18 +60,15 @@ const main = async () => {
   try {
     // should only run on first name
     if (currentName === `npm${"-"}lib${"-"}name`) {
-      await rimraf(path.join(projectRoot, ".git"));
-      execSync(
-        "git init && git add . && git commit -m 'Initial commit from just-build'",
-        {
-          cwd: projectRoot,
-        }
-      );
-      console.log("New git repo created");
-      execSync("npx husky install", {
+      await deleteFolder(path.join(projectRoot, ".git"));
+      execSync("git init && git add . && git commit -m 'Initial commit from just-build'", {
         cwd: projectRoot,
       });
-      console.log("Husky git hooks installed");
+      console.log("New git repo created");
+      execSync("npx simple-git-hooks", {
+        cwd: projectRoot,
+      });
+      console.log("git hooks installed");
     }
   } catch {
     //

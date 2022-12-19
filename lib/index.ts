@@ -1,3 +1,5 @@
+import { exclamation } from "./exclamation";
+
 export const hello = (world: string): string => {
-  return `Hello ${world}!`;
+  return exclamation(`Hello ${world}`);
 };

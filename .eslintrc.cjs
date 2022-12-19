@@ -28,9 +28,10 @@ module.exports = {
   plugins: ["@typescript-eslint", "unicorn", "prettier"],
   ignorePatterns,
   rules: {
-    "arrow-body-style": ["warn", "always"],
+    "arrow-body-style": "off",
     "no-array-constructor": "off",
-    "no-console": "warn",
+    "no-console": "error",
+    "no-empty": ["error", { allowEmptyCatch: true }],
     "@typescript-eslint/no-unused-vars": [
       "error",
       {
@@ -45,16 +46,7 @@ module.exports = {
     ],
     "@typescript-eslint/no-array-constructor": ["error"],
     "@typescript-eslint/no-explicit-any": ["warn"],
-    "unicorn/filename-case": [
-      "error",
-      {
-        cases: {
-          camelCase: true,
-          pascalCase: true,
-        },
-        ignore: ["-env\\.d\\.ts$"],
-      },
-    ],
+    "unicorn/filename-case": "off",
     "unicorn/no-null": "off",
     "unicorn/prevent-abbreviations": [
       "error",
@@ -73,6 +65,7 @@ module.exports = {
     ],
     "unicorn/prefer-switch": ["error", { minimumCases: 5 }],
     "unicorn/no-new-array": "off",
+    "unicorn/no-await-expression-member": "off",
   },
   overrides: [
     {
@@ -80,6 +73,13 @@ module.exports = {
       rules: {
         "unicorn/prefer-module": "off",
         "@typescript-eslint/no-var-requires": "off",
+      },
+    },
+    {
+      files: [".scripts/**/*.ts"],
+      rules: {
+        "no-console": "off",
+        "unicorn/no-process-exit": "off",
       },
     },
   ],
