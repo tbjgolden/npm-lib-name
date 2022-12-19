@@ -5,6 +5,7 @@
   "main": "dist/cjs/index.cjs",
   "module": "dist/esm/index.mjs",
   "types": "dist/esm/index.d.ts",
+  "homepage": "https://github.com/tbjgolden/npm-lib-name",
   "author": {
     "name": "Tom Golden",
     "email": "oss@tom.bio",

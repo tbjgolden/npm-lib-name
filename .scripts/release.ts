@@ -46,6 +46,9 @@ const warnings: string[] = [];
   if (packageJson.name === undefined) {
     errors.push(`package.json should have a name`);
   }
+  if (packageJson.homepage === undefined) {
+    errors.push(`package.json should have a homepage pointed to the git repo`);
+  }
   if (
     packageJson?.scripts?.test === undefined ||
     packageJson.scripts.test.includes("no test specified")
@@ -260,7 +263,7 @@ console.log("final release checks passed... releasing...");
 
 // the release
 {
-  const { name, license, main, module, types, author } = await getPackageJson();
+  const { name, license, main, module, types, author, homepage } = await getPackageJson();
   for (const distFile of [main, module, types]) {
     if (distFile) {
       const distFileContents = await readFile(distFile);
@@ -297,15 +300,7 @@ console.log("final release checks passed... releasing...");
   execSync(`git push origin v${nextVersion}`, { stdio: "inherit" });
   execSync(`npm publish --dry-run`, { stdio: "inherit" });
 
-  const gitRemote = execSync("git remote get-url origin").toString().trim();
-  let projectPath = "";
-  if (gitRemote.startsWith("https://github.com/")) {
-    projectPath = gitRemote.slice(19, gitRemote.endsWith(".git") ? -4 : Number.POSITIVE_INFINITY);
-  } else if (gitRemote.startsWith("git@github.com:")) {
-    projectPath = gitRemote.slice(15, gitRemote.endsWith(".git") ? -4 : Number.POSITIVE_INFINITY);
-  }
-
-  if (projectPath) {
+  if (homepage && homepage.startsWith("https://github.com/")) {
     const majorMessages = majors
       .map(({ message }) => `- ${message}`)
       .filter((commit, index, arr) => {
@@ -334,7 +329,7 @@ console.log("final release checks passed... releasing...");
 
     console.log("Create GitHub release:");
     console.log(
-      `https://github.com/${projectPath}/releases/new?tag=v${nextVersion}&title=v${nextVersion}&body=${encodedBody}`
+      `${homepage}/releases/new?tag=v${nextVersion}&title=v${nextVersion}&body=${encodedBody}`
     );
   }
 }
