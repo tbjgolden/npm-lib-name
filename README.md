@@ -1,9 +1,10 @@
 ```sh
 git clone https://github.com/tbjgolden/npm-lib-name.git cool-package-name
 cd cool-package-name
+npx find-repl npm-lib-name cool-package-name
+rm -rf .git
+git init
 npm install
-# One time init function to convert template to new project
-npx xnr .scripts/name.ts
 ```
 
 ---

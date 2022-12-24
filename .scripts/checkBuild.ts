@@ -1,11 +1,9 @@
 import { isFile } from "easier-node";
 import { execSync } from "node:child_process";
-import fs from "node:fs/promises";
-import { join } from "node:path/posix";
-import { getPackageJson } from "./lib/package";
-import { checkDirectory } from "./lib/checkDirectory";
+import { access, constants } from "node:fs/promises";
+import { getPackageJson, checkDirectory } from "./lib/utils";
 
-await checkDirectory();
+checkDirectory();
 
 const packageJson = await getPackageJson();
 
@@ -15,7 +13,7 @@ if (await isFile("cli/index.ts")) {
     if (cliFilePath) {
       let isExecutable: boolean;
       try {
-        await fs.access(cliFilePath, fs.constants.X_OK);
+        await access(cliFilePath, constants.X_OK);
         isExecutable = await isFile(cliFilePath);
       } catch {
         isExecutable = false;
@@ -52,7 +50,7 @@ if (await isFile("lib/index.ts")) {
       process.exit(1);
     }
 
-    const { hello } = await import(join(process.cwd(), packageJson.module));
+    const { hello } = await import(process.cwd() + "/" + packageJson.module);
 
     const result = hello("arg1 arg2");
     const expected = `Hello arg1 arg2!`;
@@ -77,7 +75,7 @@ if (await isFile("lib/index.ts")) {
   }
 
   // eslint-disable-next-line @typescript-eslint/no-var-requires, unicorn/prefer-module
-  const { hello } = require(join(process.cwd(), packageJson.main));
+  const { hello } = require(process.cwd() + "/" + packageJson.main);
 
   const result = hello("arg1 arg2");
   const expected = `Hello arg1 arg2!`;

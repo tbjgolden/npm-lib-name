@@ -1,26 +1,10 @@
+import { isFile } from "easier-node";
 import fs from "node:fs/promises";
-import path from "node:path";
 
-export const getPackageRoot = async (): Promise<string> => {
-  let directory = process.cwd();
-
-  do {
-    try {
-      const stats = await fs.stat(path.join(directory, "package.json"));
-      if (stats.isFile()) {
-        break;
-      }
-    } catch {
-      //
-    }
-    directory = path.dirname(directory);
-  } while (directory !== "/");
-
-  if (directory === "/") {
-    throw new Error("package directory not found");
+export const checkDirectory = async () => {
+  if (!(await isFile(process.cwd() + "/package.json"))) {
+    throw new Error("must be run from package root");
   }
-
-  return directory;
 };
 
 type JSONPrimitive = string | number | boolean | null;
@@ -111,7 +95,7 @@ const expectToBeStringOrStringMap = expecter((value) => {
 });
 
 export const getPackageJson = async (): Promise<PackageJson> => {
-  const json = await fs.readFile(path.join(await getPackageRoot(), "package.json"), "utf8");
+  const json = await fs.readFile(process.cwd() + "/package.json", "utf8");
   const obj = (JSON.parse(json) ?? {}) as JSONObject;
   let key = "";
   try {
