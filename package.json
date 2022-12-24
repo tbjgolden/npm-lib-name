@@ -1,7 +1,6 @@
 {
   "name": "npm-lib-name",
   "version": "0.0.0",
-  "description": "Conventional commit message enforcer 🧐",
   "license": "Apache-2.0",
   "main": "dist/cjs/index.cjs",
   "module": "dist/esm/index.mjs",
