@@ -24,8 +24,6 @@
     "build": "xnr ./.scripts/build.ts",
     "check-build": "xnr ./.scripts/checkBuild.ts",
     "test": "NODE_OPTIONS='--experimental-vm-modules --no-warnings' npx jest",
-    "coverage": "NODE_OPTIONS='--experimental-vm-modules --no-warnings' npx jest --coverage",
-    "watch": "NODE_OPTIONS='--experimental-vm-modules --no-warnings' npx jest --watch",
     "prepare": "simple-git-hooks"
   },
   "devDependencies": {
