@@ -19,12 +19,7 @@ import { checkDirectory } from "./lib/utils";
 const SHOULD_BUILD_CLI = await isFile("cli/index.ts");
 const SHOULD_BUILD_LIB = await isFile("lib/index.ts");
 
-type TSConfig = {
-  compilerOptions: {
-    [args: string]: unknown;
-  };
-  [args: string]: unknown;
-};
+type TSConfig = { compilerOptions: { [args: string]: unknown }; [args: string]: unknown };
 const tsc = async (tsConfig: TSConfig) => {
   tsConfig.compilerOptions.noEmit = false;
   tsConfig.include = ["lib/**/*"];
