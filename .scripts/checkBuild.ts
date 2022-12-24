@@ -50,7 +50,7 @@ if (await isDirectory("lib")) {
     process.exit(1);
   }
   if (!(await isFile(entrypoint))) {
-    console.log(`no entrypoint file "${entrypoint}" exists`);
+    console.log(`entrypoint file "${entrypoint}" doesn't exist`);
     process.exit(1);
   }
   const { hello } = await import(process.cwd() + "/" + entrypoint);
