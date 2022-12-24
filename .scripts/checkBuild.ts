@@ -1,7 +1,6 @@
-import { isFile } from "easier-node";
 import { execSync } from "node:child_process";
 import { access, constants } from "node:fs/promises";
-import { getPackageJson, checkDirectory } from "./lib/utils";
+import { getPackageJson, checkDirectory, isFile } from "./lib/utils.js";
 
 checkDirectory();
 

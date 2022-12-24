@@ -1,5 +1,12 @@
-import { isFile } from "easier-node";
-import fs from "node:fs/promises";
+import { lstat } from "node:fs/promises";
+
+export const isFile = async (path: string): Promise<boolean> => {
+  try {
+    return (await lstat(path)).isFile();
+  } catch {
+    return false;
+  }
+};
 
 export const checkDirectory = async () => {
   if (!(await isFile(process.cwd() + "/package.json"))) {
