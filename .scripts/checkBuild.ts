@@ -1,28 +1,24 @@
 import { execSync } from "node:child_process";
-import { access, constants } from "node:fs/promises";
-import { getPackageJson, checkDirectory, isFile } from "./lib/utils.js";
+import { getPackageJson, checkDirectory, isFile, isDirectory } from "./lib/utils";
 
 checkDirectory();
 
 const packageJson = await getPackageJson();
 
-if (await isFile("cli/index.ts")) {
+if (await isDirectory("cli")) {
   console.log("validating cli...");
   for (const [cliName, cliFilePath] of Object.entries(packageJson.bin ?? {})) {
     if (cliFilePath) {
-      let isExecutable: boolean;
+      let isCliPathAFile = false;
       try {
-        await access(cliFilePath, constants.X_OK);
-        isExecutable = await isFile(cliFilePath);
-      } catch {
-        isExecutable = false;
-      }
-      if (!isExecutable) {
+        isCliPathAFile = await isFile(cliFilePath);
+      } catch {}
+      if (!isCliPathAFile) {
         console.log(`"${cliName}": "${cliFilePath}" is not an executable file`);
         process.exit(1);
       }
       const command = `${cliFilePath} arg1 arg2`;
-      const stdout = execSync(command).toString();
+      const stdout = execSync(`node ${command}`).toString();
       const expected = `Hello arg1 arg2!\n`;
       if (stdout !== expected) {
         console.log(`unexpected response when running: ${command}\n`);
@@ -36,46 +32,28 @@ if (await isFile("cli/index.ts")) {
   }
 }
 
-if (await isFile("lib/index.ts")) {
-  console.log("validating api (esm)...");
-  if (typeof packageJson.module !== "string") {
-    console.log("package.json module must be a path to the esm entrypoint");
-    process.exit(1);
-  }
+if (await isDirectory("lib")) {
+  console.log("validating api...");
 
-  if (packageJson.module) {
-    if (!(await isFile(packageJson.module))) {
-      console.log(`"module": "${packageJson.module}" must refer to a file`);
+  let entrypoint: string | undefined;
+  if (packageJson.exports) {
+    if (packageJson.exports.startsWith("./")) {
+      entrypoint = packageJson.exports.slice(2);
+    } else {
+      console.log("package.json exports must start with './'");
       process.exit(1);
     }
-
-    const { hello } = await import(process.cwd() + "/" + packageJson.module);
-
-    const result = hello("arg1 arg2");
-    const expected = `Hello arg1 arg2!`;
-    if (result !== expected) {
-      console.log("expected:");
-      console.log(JSON.stringify(expected));
-      console.log("actual:");
-      console.log(JSON.stringify(result));
-      process.exit(1);
-    }
-  }
-
-  console.log("validating api (cjs)...");
-  if (typeof packageJson.main !== "string") {
-    console.log("package.json main must be a path to the cjs entrypoint");
+  } else if (packageJson.main) {
+    entrypoint = packageJson.main;
+  } else {
+    console.log("package.json exports field or main field must be specified");
     process.exit(1);
   }
-
-  if (!(await isFile(packageJson.main))) {
-    console.log(`"main": "${packageJson.main}" must refer to a file`);
+  if (!(await isFile(entrypoint))) {
+    console.log(`no entrypoint file "${entrypoint}" exists`);
     process.exit(1);
   }
-
-  // eslint-disable-next-line @typescript-eslint/no-var-requires, unicorn/prefer-module
-  const { hello } = require(process.cwd() + "/" + packageJson.main);
-
+  const { hello } = await import(process.cwd() + "/" + entrypoint);
   const result = hello("arg1 arg2");
   const expected = `Hello arg1 arg2!`;
   if (result !== expected) {
@@ -83,12 +61,6 @@ if (await isFile("lib/index.ts")) {
     console.log(JSON.stringify(expected));
     console.log("actual:");
     console.log(JSON.stringify(result));
-    process.exit(1);
-  }
-
-  const typesEntryFilePath = packageJson.types;
-  if (typeof typesEntryFilePath !== "string" || !(await isFile(typesEntryFilePath))) {
-    console.log(`"types": "${typesEntryFilePath}" must refer to a file`);
     process.exit(1);
   }
 }

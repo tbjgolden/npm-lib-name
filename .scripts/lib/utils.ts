@@ -1,4 +1,12 @@
-import { lstat } from "node:fs/promises";
+import { lstat, readFile } from "node:fs/promises";
+
+export const isDirectory = async (path: string): Promise<boolean> => {
+  try {
+    return (await lstat(path)).isDirectory();
+  } catch {
+    return false;
+  }
+};
 
 export const isFile = async (path: string): Promise<boolean> => {
   try {
@@ -28,6 +36,7 @@ export type PackageJson = Partial<{
   license: string;
   main: string;
   module: string;
+  exports: string;
   types: string;
   browser: string;
   keywords: string[];
@@ -102,7 +111,7 @@ const expectToBeStringOrStringMap = expecter((value) => {
 });
 
 export const getPackageJson = async (): Promise<PackageJson> => {
-  const json = await fs.readFile(process.cwd() + "/package.json", "utf8");
+  const json = await readFile(process.cwd() + "/package.json", "utf8");
   const obj = (JSON.parse(json) ?? {}) as JSONObject;
   let key = "";
   try {
@@ -114,6 +123,7 @@ export const getPackageJson = async (): Promise<PackageJson> => {
       "license",
       "main",
       "module",
+      "exports",
       "types",
       "browser",
     ]) {

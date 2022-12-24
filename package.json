@@ -2,22 +2,22 @@
   "name": "npm-lib-name",
   "version": "0.0.0",
   "license": "Apache-2.0",
-  "main": "dist/cjs/index.cjs",
-  "module": "dist/esm/index.mjs",
-  "types": "dist/esm/index.d.ts",
+  "type": "module",
+  "main": "./dist/lib/index.js",
+  "exports": "./dist/lib/index.js",
+  "types": "./dist/lib/index.d.ts",
+  "bin": {
+    "npm-lib-name": "./dist/cli/index.js"
+  },
   "homepage": "https://github.com/tbjgolden/npm-lib-name",
   "author": {
     "name": "Tom Golden",
     "email": "oss@tom.bio",
     "url": "https://tom.bio"
   },
-  "type": "module",
-  "bin": {
-    "npm-lib-name": "./dist/cli/index.mjs"
-  },
   "engines": {
-    "node": ">=16.14.0",
-    "npm": ">=6.8.0"
+    "node": ">=17.1.0 || ^16.14.0",
+    "npm": ">=6.14.17"
   },
   "scripts": {
     "build": "xnr ./.scripts/build.ts",

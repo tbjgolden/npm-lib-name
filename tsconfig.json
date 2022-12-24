@@ -3,7 +3,6 @@
     "target": "ES2022",
     "lib": [],
     "module": "NodeNext",
-    "moduleResolution": "node",
     "resolveJsonModule": true,
     "declaration": true,
     "declarationMap": false,
@@ -14,7 +13,7 @@
     "strict": true,
     "skipLibCheck": true,
     "noEmit": true,
-    "outDir": "dist/esm"
+    "outDir": "dist"
   },
   "include": ["typings.d.ts", "cli/**/*", "lib/**/*"]
 }
