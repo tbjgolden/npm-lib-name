@@ -14,7 +14,6 @@ npm install
 ![banner](banner.svg)
 
 ![npm](https://img.shields.io/npm/v/npm-lib-name)
-![coverage](https://img.shields.io/badge/dynamic/json?url=https%3A%2F%2Fraw.githubusercontent.com%2Ftbjgolden%2Fnpm-lib-name%2Fmain%2Fcoverage.json&label=coverage&query=$.total.lines.pct&color=brightgreen&suffix=%25)
 ![npm type definitions](https://img.shields.io/npm/types/npm-lib-name)
 ![license](https://img.shields.io/npm/l/npm-lib-name)
 [![install size](https://packagephobia.com/badge?p=npm-lib-name)](https://packagephobia.com/result?p=npm-lib-name)

@@ -44,7 +44,8 @@
     "xnr": "^1.0.1"
   },
   "files": [
-    "dist"
+    "dist",
+    "!dist/cli/*.d.*ts"
   ],
   "simple-git-hooks": {
     "commit-msg": "npx msg-time",
@@ -82,10 +83,5 @@
     "transform": {
       "\\.ts$": "<rootDir>/node_modules/xnr/jest.js"
     }
-  },
-  "commitlint": {
-    "extends": [
-      "@commitlint/config-conventional"
-    ]
   }
 }
