@@ -21,6 +21,7 @@ module.exports = {
   parser: "@typescript-eslint/parser",
   extends: [
     "eslint:recommended",
+    "plugin:security/recommended",
     "plugin:@typescript-eslint/recommended",
     "plugin:unicorn/recommended",
     "prettier",
