@@ -1,17 +1,3 @@
-const fs = require("fs");
-const path = require("path");
-
-// Use gitignore as eslintignore (single source of truth)
-const ignorePatterns = fs
-  .readFileSync(path.join(__dirname, ".gitignore"), "utf8")
-  .split("\n")
-  .map((line) => {
-    return line.split("#")[0].trim();
-  })
-  .filter((withoutComment) => {
-    return withoutComment.length > 0;
-  });
-
 module.exports = {
   env: {
     browser: true,
@@ -27,7 +13,11 @@ module.exports = {
     "prettier",
   ],
   plugins: ["@typescript-eslint", "unicorn", "prettier"],
-  ignorePatterns,
+  ignorePatterns: require("fs")
+    .readFileSync(".gitignore", "utf8")
+    .split("\n")
+    .map((line) => line.split("#")[0].trim())
+    .filter((withoutComment) => withoutComment.length > 0),
   rules: {
     "arrow-body-style": "off",
     "no-array-constructor": "off",
