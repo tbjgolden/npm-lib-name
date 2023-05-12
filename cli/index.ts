@@ -1,6 +1,4 @@
 #!/usr/bin/env node
-/* eslint-disable no-console */
-
 import { hello } from "../lib/index.js";
 
 const [_cmd, _fileName, ...args] = process.argv;

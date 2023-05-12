@@ -1,5 +1,5 @@
 import { execSync } from "node:child_process";
-import { getPackageJson, checkDirectory, isFile, isDirectory } from "./lib/utils";
+import { getPackageJson, checkDirectory, isFile, isDirectory } from "./lib/utils.js";
 
 checkDirectory();
 

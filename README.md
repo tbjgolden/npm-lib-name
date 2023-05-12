@@ -20,8 +20,6 @@ npm install
 
 A npm library that does exactly what it says on the tin.
 
-## Table of Contents
-
 ## Background
 
 - Cover motivation.

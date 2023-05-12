@@ -1,4 +1,5 @@
-module.exports = {
+/** @type {import('eslint').Linter.BaseConfig & { ignorePatterns: string[] }} */
+const config = {
   env: {
     browser: true,
     jest: true,
@@ -7,7 +8,6 @@ module.exports = {
   parser: "@typescript-eslint/parser",
   extends: [
     "eslint:recommended",
-    "plugin:security/recommended",
     "plugin:@typescript-eslint/recommended",
     "plugin:unicorn/recommended",
     "prettier",
@@ -67,11 +67,38 @@ module.exports = {
       },
     },
     {
-      files: [".scripts/**/*.ts"],
+      files: [".scripts/**/*.ts", "cli/**/*.ts"],
       rules: {
         "no-console": "off",
         "unicorn/no-process-exit": "off",
       },
     },
+    {
+      files: ["lib/**/*.ts"],
+      extends: ["plugin:security/recommended"],
+      overrides: [
+        {
+          files: ["lib/**/*.test.ts"],
+          rules: {
+            "security/detect-unsafe-regex": 0,
+            "security/detect-non-literal-regexp": 0,
+            "security/detect-non-literal-require": 0,
+            "security/detect-non-literal-fs-filename": 0,
+            "security/detect-eval-with-expression": 0,
+            "security/detect-pseudoRandomBytes": 0,
+            "security/detect-possible-timing-attacks": 0,
+            "security/detect-no-csrf-before-method-override": 0,
+            "security/detect-buffer-noassert": 0,
+            "security/detect-child-process": 0,
+            "security/detect-disable-mustache-escape": 0,
+            "security/detect-object-injection": 0,
+            "security/detect-new-buffer": 0,
+            "security/detect-bidi-characters": 0,
+          },
+        },
+      ],
+    },
   ],
 };
+
+module.exports = config;
