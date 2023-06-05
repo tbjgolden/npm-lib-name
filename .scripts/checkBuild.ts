@@ -54,13 +54,13 @@ if (await isDirectory("lib")) {
     process.exit(1);
   }
   const { hello } = await import(process.cwd() + "/" + entrypoint);
-  const result = hello("arg1 arg2");
-  const expected = `Hello arg1 arg2!`;
+  const result = JSON.stringify(hello("arg1 arg2"));
+  const expected = JSON.stringify(`Hello arg1 arg2!`);
   if (result !== expected) {
     console.log("expected:");
-    console.log(JSON.stringify(expected));
+    console.log(expected);
     console.log("actual:");
-    console.log(JSON.stringify(result));
+    console.log(result);
     process.exit(1);
   }
 }

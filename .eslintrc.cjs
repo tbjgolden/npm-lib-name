@@ -13,7 +13,7 @@ const config = {
     "prettier",
   ],
   plugins: ["@typescript-eslint", "unicorn", "prettier"],
-  ignorePatterns: require("fs")
+  ignorePatterns: require("node:fs")
     .readFileSync(".gitignore", "utf8")
     .split("\n")
     .map((line) => line.split("#")[0].trim())

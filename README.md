@@ -9,7 +9,7 @@ npm install
 
 ---
 
-# npm-lib-name
+# `npm-lib-name`
 
 ![banner](banner.svg)
 
