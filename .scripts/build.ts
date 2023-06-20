@@ -21,11 +21,18 @@ const buildTsconfig: TSConfig = {
   compilerOptions: { ...tsconfigJson.compilerOptions, noEmit: false },
 };
 await writeFile("tsconfig.tmp.json", JSON.stringify(buildTsconfig));
-await new Promise<void>((resolve, reject) => {
-  const child = spawn("npx", ["tsc", "--project", "tsconfig.tmp.json"]);
+await new Promise<void>((resolve) => {
+  const child = spawn("npx", ["tsc", "--project", "tsconfig.tmp.json"], {
+    stdio: "inherit",
+  });
+  child.on("message", console.log);
   child.on("exit", async (code) => {
-    if (code) reject(new Error(`Error code: ${code}`));
-    else resolve();
+    await rm("tsconfig.tmp.json");
+    if (code) {
+      process.exit(code);
+    } else {
+      resolve();
+    }
   });
 });
-await rm("tsconfig.tmp.json");
+
